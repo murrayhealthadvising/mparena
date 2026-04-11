@@ -655,12 +655,23 @@ async function importCsv(){
   const tag=document.getElementById('csv-tag').value.trim();
   const btn=document.getElementById('csv-import-btn');
   btn.textContent='Importing...';btn.disabled=true;
-  let imported=0,dupes=0;
+
+  // Build a set of all existing phones in CRM (normalized to digits only)
+  const existingPhones=new Set(leads.map(l=>(l.phone||'').replace(/\D/g,'')).filter(Boolean));
+  // Also track phones seen within this CSV to dedupe within the file itself
+  const csvPhonesSeen=new Set();
+
+  let imported=0,dupeCrm=0,dupeCsv=0,noPhone=0;
   for(const row of rows){
     const mapped=mapCsvRow(row);
-    if(!mapped.firstName&&!mapped.phone)continue;
-    // Skip if phone already exists
-    if(mapped.phone&&leads.find(l=>l.phone&&l.phone.replace(/\D/g,'')===(mapped.phone||'').replace(/\D/g,''))){{dupes++;continue;}}
+    if(!mapped.firstName&&!mapped.phone){noPhone++;continue;}
+    const normPhone=(mapped.phone||'').replace(/\D/g,'');
+    // Skip if duplicate within the CSV itself
+    if(normPhone&&csvPhonesSeen.has(normPhone)){dupeCsv++;continue;}
+    // Skip if already exists in CRM
+    if(normPhone&&existingPhones.has(normPhone)){dupeCrm++;continue;}
+    // Mark as seen
+    if(normPhone){csvPhonesSeen.add(normPhone);existingPhones.add(normPhone);}
     const tags=tag?['new','custom:'+tag]:['new'];
     const lead={
       id:crypto.randomUUID(),
@@ -679,7 +690,11 @@ async function importCsv(){
   renderLeads();updateStats();
   btn.textContent='Import leads';btn.disabled=false;
   closeImportCsv();
-  alert(imported+' leads imported'+(dupes?' ('+dupes+' duplicates skipped)':'')+'.');
+  const msg=['\u2713 '+imported+' leads imported'];
+  if(dupeCsv)msg.push(dupeCsv+' duplicates within CSV removed');
+  if(dupeCrm)msg.push(dupeCrm+' already in your CRM skipped');
+  if(noPhone)msg.push(noPhone+' rows skipped (no phone)');
+  alert(msg.join('\n'));
 }
 
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});

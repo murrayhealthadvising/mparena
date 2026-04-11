@@ -26,5 +26,190 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .filters input:focus,.filters select:focus{border-color:#378ADD}
 .btn-reset{background:transparent;color:#64748b;border:1px solid #2a3347;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer}
 .btn-reset:hover{color:#e2e8f0;border-color:#378ADD}
-.count-bar{padding:8px 20px;font-size:12px;color:#64748b;border-bottom:1px solid #1e2535;background:#151821;display:fle{;justify-content:space-between;align-items:center}
+.count-bar{padding:8px 20px;font-size:12px;color:#64748b;border-bottom:1px solid #1e2535;background:#151821;display:flex;justify-content:space-between;align-items:center}
 .leads-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.lead-card{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:border-color 0.15s}
+.lead-card.expanded{border-color:#378ADD}
+.lead-top{display:flex;gap:14px;align-items:flex-start}
+.lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0}
+.lead-main{flex:1;min-width:0}
+.lead-name{font-size:15px;font-weight:600;color:#e2e8f0}
+.lead-phone{color:#378ADD;font-size:14px;font-weight:500;margin-top:2px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0}
+.lead-phone:hover{color:#85B7EB}
+.copy-hint{font-size:10px;color:#64748b;opacity:0;transition:opacity 0.15s}
+.lead-phone:hover .copy-hint{opacity:1}
+.copied-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.copied-toast.show{opacity:1}
+.lead-meta{font-size:12px;color:#64748b;margin-top:3px}
+.lead-right{text-align:right;flex-shrink:0}
+.lead-date{font-size:11px;color:#64748b}
+.lead-cost{font-size:12px;color:#94a3b8;margin-top:3px}
+.disp-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px;letter-spacing:0.2px}
+.disp-badge .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.d-new{background:#1a2133;color:#64748b}.d-new .dot{background:#64748b}
+.d-sold{background:#173404;color:#97C459}.d-sold .dot{background:#97C459}
+.d-notinterested{background:#3a1010;color:#F09595}.d-notinterested .dot{background:#E24B4A}
+.d-callback{background:#042C53;color:#85B7EB}.d-callback .dot{background:#378ADD}
+.d-noanswer{background:#2a1f08;color:#EF9F27}.d-noanswer .dot{background:#EF9F27}
+.d-badnum{background:#2d1508;color:#F0997B}.d-badnum .dot{background:#D85A30}
+.d-appointment{background:#04342C;color:#5DCAA5}.d-appointment .dot{background:#1D9E75}
+.d-pitched{background:#1a1540;color:#AFA9EC}.d-pitched .dot{background:#7F77DD}
+.d-missedapt{background:#2a0f1c;color:#ED93B1}.d-missedapt .dot{background:#D4537E}
+.d-custom{background:#1a1a2e;color:#94a3b8}.d-custom .dot{background:#94a3b8}
+.expand-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px;margin-top:4px}
+.expand-btn:hover{color:#378ADD;background:#1a2133}
+.lead-expanded{margin-top:14px;border-top:1px solid #1e2535;padding-top:16px}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.info-group{display:flex;flex-direction:column;gap:8px}
+.info-row{display:flex;flex-direction:column;gap:2px}
+.info-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px}
+.info-val{font-size:13px;color:#e2e8f0}
+.section-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.disp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.disp-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:5px;letter-spacing:0.2px;user-select:none}
+.disp-pill .pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dp-new{background:#1a2133;color:#64748b;border-color:#2a3347}.dp-new .pdot{background:#64748b}
+.dp-new.active,.dp-new:hover{background:#22293a;border-color:#64748b}
+.dp-sold{background:#0d2006;color:#97C459;border-color:#1a3a0a}.dp-sold .pdot{background:#97C459}
+.dp-sold.active,.dp-sold:hover{background:#173404;border-color:#639922}
+.dp-notinterested{background:#280a0a;color:#F09595;border-color:#3a1010}.dp-notinterested .pdot{background:#E24B4A}
+.dp-notinterested.active,.dp-notinterested:hover{background:#3a1010;border-color:#A32D2D}
+.dp-callback{background:#021a33;color:#85B7EB;border-color:#0a2a4a}.dp-callback .pdot{background:#378ADD}
+.dp-callback.active,.dp-callback:hover{background:#042C53;border-color:#185FA5}
+.dp-noanswer{background:#1a1204;color:#EF9F27;border-color:#2a1f08}.dp-noanswer .pdot{background:#EF9F27}
+.dp-noanswer.active,.dp-noanswer:hover{background:#2a1f08;border-color:#854F0B}
+.dp-badnum{background:#1f0d04;color:#F0997B;border-color:#2d1508}.dp-badnum .pdot{background:#D85A30}
+.dp-badnum.active,.dp-badnum:hover{background:#2d1508;border-color:#993C1D}
+.dp-appointment{background:#021f1a;color:#5DCAA5;border-color:#04342C}.dp-appointment .pdot{background:#1D9E75}
+.dp-appointment.active,.dp-appointment:hover{background:#04342C;border-color:#0F6E56}
+.dp-pitched{background:#100e2a;color:#AFA9EC;border-color:#1a1540}.dp-pitched .pdot{background:#7F77DD}
+.dp-pitched.active,.dp-pitched:hover{background:#1a1540;border-color:#534AB7}
+.dp-missedapt{background:#1a0810;color:#ED93B1;border-color:#2a0f1c}.dp-missedapt .pdot{background:#D4537E}
+.dp-missedapt.active,.dp-missedapt:hover{background:#2a0f1c;border-color:#993556}
+.dp-custom{background:#111827;color:#94a3b8;border-color:#1e2535}.dp-custom .pdot{background:#94a3b8}
+.dp-custom.active,.dp-custom:hover{background:#1e2535;border-color:#64748b}
+.custom-tag-input{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:7px 12px;font-size:13px;outline:none;width:180px;margin-bottom:14px;display:block}
+.custom-tag-input:focus{border-color:#378ADD}
+.notes-area{background:#1a2133;border:1px solid #2a3347;border-radius:10px;color:#e2e8f0;padding:14px;font-size:14px;width:100%;resize:vertical;min-height:120px;outline:none;line-height:1.6}
+.notes-area:focus{border-color:#378ADD}
+.notes-area::placeholder{color:#475569}
+.notes-saved{font-size:11px;color:#639922;margin-top:5px;height:16px}
+.action-row{display:flex;gap:8px;margin-top:12px;align-items:center}
+.btn-call{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;text-decoration:none}
+.btn-call:hover{background:#185FA5}
+.btn-call svg{width:14px;height:14px;flex-shrink:0}
+.new-tag{background:#0C447C;color:#85B7EB;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:middle}
+.empty-state{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;margin-right:6px}
+.status-dot.active{background:#639922}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#151821;border:1px solid #2a3347;border-radius:14px;padding:28px;width:100%;max-width:480px;margin:20px}
+.modal-title{font-size:16px;font-weight:600;color:#e2e8f0;margin-bottom:6px}
+.modal-sub{font-size:13px;color:#64748b;margin-bottom:20px;line-height:1.5}
+.modal-input{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:14px;outline:none;width:100%;margin-bottom:12px;display:block}
+.modal-input:focus{border-color:#378ADD}
+.modal-input::placeholder{color:#64748b}
+.modal-row{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.btn-cancel{background:transparent;color:#64748b;border:1px solid #2a3347;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer}
+.btn-cancel:hover{color:#e2e8f0}
+.poll-status{font-size:12px;padding:4px 10px;border-radius:6px;background:#1a2133;color:#64748b}
+.poll-status.live{background:#0d2006;color:#97C459}
+</style>
+</head>
+<body>
+
+<div class="copied-toast" id="copied-toast">Number copied!</div>
+<div class="topbar">
+  <div class="logo">MParena</div>
+  <div class="topbar-right">
+    <span class="poll-status" id="poll-status">Not connected</span>
+    <button class="btn-ghost" onclick="openSetup()">Gmail setup</button>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-total">0</div><div class="stat-label">Total leads</div></div>
+  <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-new">0</div><div class="stat-label">Today</div></div>
+  <div class="stat"><div class="stat-num" style="color:#97C459" id="s-sold">0</div><div class="stat-label">Sold</div></div>
+  <div class="stat"><div class="stat-num" style="color:#5DCAA5" id="s-apt">0</div><div class="stat-label">Appointments</div></div>
+  <div class="stat"><div class="stat-num" style="color:#85B7EB" id="s-cb">0</div><div class="stat-label">Call backs</div></div>
+  <div class="stat"><div class="stat-num" style="color:#AFA9EC" id="s-pitched">0</div><div class="stat-label">Pitched</div></div>
+</div>
+
+<div class="filters">
+  <input id="search" placeholder="Search name, phone, email..." oninput="renderLeads()"/>
+  <select id="f-state" onchange="renderLeads()"><option value="">All states</option></select>
+  <select id="f-disp" onchange="renderLeads()">
+    <option value="">All dispositions</option>
+    <option value="new">New</option>
+    <option value="sold">Sold</option>
+    <option value="notinterested">Not interested</option>
+    <option value="callback">Call back</option>
+    <option value="noanswer">No answer</option>
+    <option value="badnum">Bad #</option>
+    <option value="appointment">Appointment</option>
+    <option value="pitched">Pitched</option>
+    <option value="missedapt">Missed apt</option>
+    <option value="custom">Custom</option>
+  </select>
+  <select id="f-household" onchange="renderLeads()">
+    <option value="">All households</option>
+    <option value="Individual">Individual</option>
+    <option value="Family">Family</option>
+    <option value="Couple">Couple</option>
+  </select>
+  <button class="btn-reset" onclick="resetFilters()">Reset</button>
+</div>
+
+<div class="count-bar">
+  <span id="count-label">0 leads</span>
+  <span id="last-check" style="font-size:11px;color:#64748b"></span>
+</div>
+
+<div class="leads-list" id="leads-list"></div>
+
+<div class="modal-bg" id="setup-modal">
+  <div class="modal">
+    <div class="modal-title">Connect Gmail inbox</div>
+    <div class="modal-sub">Your CRM will poll this inbox every 2 minutes for new lead emails from LeadArena.</div>
+    <input class="modal-input" id="gmail-addr" type="email" placeholder="leads@gmail.com"/>
+    <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
+    <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords → Select app: Mail</div>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeSetup()">Cancel</button>
+      <button class="btn-primary" onclick="saveGmail()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DISPS=[{key:'new',label:'New',pill:'dp-new',badge:'d-new'},{key:'sold',label:'Sold',pill:'dp-sold',badge:'d-sold'},{key:'notinterested',label:'Not interested',pill:'dp-notinterested',badge:'d-notinterested'},{key:'callback',label:'Call back',pill:'dp-callback',badge:'d-callback'},{key:'noanswer',label:'No answer',pill:'dp-noanswer',badge:'d-noanswer'},{key:'badnum',label:'Bad #',pill:'dp-badnum',badge:'d-badnum'},{key:'appointment',label:'Appointment',pill:'dp-appointment',badge:'d-appointment'},{key:'pitched',label:'Pitched',pill:'dp-pitched',badge:'d-pitched'},{key:'missedapt',label:'Missed apt',pill:'dp-missedapt',badge:'d-missedapt'},{key:'custom',label:'Custom',pill:'dp-custom',badge:'d-custom'}];
+let leads=JSON.parse(localStorage.getItem('mp_leads')||'[]');
+let expanded=new Set();
+let noteTimers={};
+let pollInterval=null;
+function save(){localStorage.setItem('mp_leads',JSON.stringify(leads));}
+function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
+function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
+function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
+function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function copyPhone(phone){const d=(phone||'').replace(/\D/g,'');if(!d)return;navigator.clipboard.writeText(d).then(()=>{const t=document.getElementById('copied-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);});}
+function getFiltered(){const q=document.getElementById('search').value.toLowerCase();const st=document.getElementById('f-state').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
+function renderLeads(){const list=document.getElementById('leads-list');const filtered=getFiltered();document.getElementById('count-label').textContent=filtered.length+' lead'+(filtered.length!==1?'s':'');const states=[...new Set(leads.map(l=>l.state).filter(Boolean))].sort();const sel=document.getElementById('f-state');const cur=sel.value;sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}}>${s}</option>`).join('');if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet. Connect Gmail to start receiving leads automatically.</div>';return;}list.innerHTML=filtered.map(l=>{const isExp=expanded.has(l.id);const di=dispInfo(l.disposition);const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;return`<div class="lead-card${isExp?' expanded':''}" id="card-${l.id}"><div class="lead-top"><div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div><div class="lead-main"><div class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</div><button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button><div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}</div><span class="disp-badge ${di.badge}"><span class="dot"></span>${dispLabel}</span></div><div class="lead-right"><div class="lead-date">${fmtDate(l.receivedAt)}</div>${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}<button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button></div></div>${isExp?`<div class="lead-expanded"><div class="exp-grid"><div class="info-group"><div class="info-row"><span class="info-label">Household</span><span class="info-val">${l.household||'—'}</span></div><div class="info-row"><span class="info-label">Age range</span><span class="info-val">${l.ageRange||l.age||'—'}</span></div><div class="info-row"><span class="info-label">Income</span><span class="info-val">${l.income||'—'}</span></div><div class="info-row"><span class="info-label">DOB</span><span class="info-val">${l.dob||'—'}</span></div></div><div class="info-group"><div class="info-row"><span class="info-label">State / Zip</span><span class="info-val">${l.state||'—'} ${l.zip||''}</span></div><div class="info-row"><span class="info-label">Campaign</span><span class="info-val">${l.campaign||'—'}</span></div><div class="info-row"><span class="info-label">Comments</span><span class="info-val">${l.comments||'—'}</span></div><div class="info-row"><span class="info-label">Lead ID</span><span class="info-val" style="font-size:11px;color:#64748b">${l.leadId||'—'}</span></div></div></div><div class="section-label">Disposition</div><div class="disp-pills">${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}</div>${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Type custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)"/>`:''}div class="section-label">Notes</div><textarea class="notes-area" id="notes-${l.id}" placeholder="Call notes, follow-up reminders, anything..." oninput="autoSaveNote('${l.id}')">${l.notes||''}</textarea><div class="notes-saved" id="saved-${l.id}"></div><div class="action-row"><a class="btn-call" href="tel:${(l.phone||'').replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Click to call</a></div></div>`:''}</div>`}).join('');}
+function toggleExpand(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);renderLeads();}
+function setDisp(id,val){const l=leads.find(x=>x.id===id);if(l){l.disposition=val;save();updateStats();renderLeads();}}
+function setCustomDisp(id,val){const l=leads.find(x=>x.id===id);if(l){l.customDisp=val;save();}}
+function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const ind=document.getElementById('saved-'+id);if(!ta)return;const l=leads.find(x=>x.id===id);if(!l)return;l.notes=ta.value;if(ind)ind.textContent='';clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(()=>{save();if(ind){ind.textContent='Saved';setTimeout(()=>{if(ind)ind.textContent='';},2000);}},800);}
+function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
+function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}
+function openSetup(){document.getElementById('setup-modal').classList.add('open');}
+function closeSetup(){document.getElementById('setup-modal').classList.remove('open');}
+function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
+function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);document.getElementById('poll-status').textContent='Live · polling every 2 min';document.getElementById('poll-status').classList.add('live');pollGmail(addr,pass);pollInterval=setInterval(()=>pollGmail(addr,pass),120000);}
+async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.emailMsgId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){leads.unshift(l);}}save();renderLeads();updateStats();}document.getElementById('last-check').textContent='Last checked: '+new Date().toLocaleTimeString();}catch(e){console.error('Poll error',e);}}
+const savedCreds=localStorage.getItem('mp_gmail');if(savedCreds){try{const{addr,pass}=JSON.parse(savedCreds);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}
+renderLeads();updateStats();
+</script>
+</body>
+</html>

@@ -154,6 +154,8 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .poll-status.live{background:#0d2006;color:#97C459}
 .saving-indicator{font-size:11px;color:#64748b;display:flex;align-items:center;gap:6px}
 .saving-dot{width:6px;height:6px;border-radius:50%;background:#378ADD;animation:pulse 1s infinite}
+#csv-drop-zone:hover{border-color:#378ADD}
+#csv-drop-zone.dragover{border-color:#1D9E75;background:#021410}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 </style>
 </head>
@@ -180,6 +182,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <div class="topbar-right">
       <span class="poll-status" id="poll-status">Checking Gmail...</span>
       <button class="btn-primary" onclick="openImportEmail()">Import email</button>
+      <button class="btn-primary" onclick="openImportCsv()" style="background:#1D9E75">Import CSV</button>
       <button class="btn-primary" onclick="openAddLead()">+ Add lead</button>
       <button class="btn-ghost" id="gmail-btn" onclick="handleGmailBtn()">Gmail setup</button>
       <div class="user-pill"><span class="user-dot"></span><span id="user-name-display">...</span></div>
@@ -217,6 +220,28 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
   </div>
   <div class="leads-list" id="leads-list"></div>
 </div>
+<div class="modal-bg" id="import-csv-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">Import leads from CSV</div>
+    <div class="modal-sub">Supports LeadSweeper CSV format. Optionally tag all imported leads with a custom label like "Pitch Perfect PRs" or "LeadSweep April".</div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Custom tag (optional)</div>
+      <input class="modal-input" id="csv-tag" placeholder='e.g. Pitch Perfect PRs, LeadSweep April...' style="margin-bottom:0"/>
+    </div>
+    <div id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()" style="border:2px dashed #2a3347;border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color 0.15s;margin-bottom:16px">
+      <div style="font-size:28px;margin-bottom:8px">&#128196;</div>
+      <div style="color:#94a3b8;font-size:14px;font-weight:500" id="csv-drop-label">Click to choose a CSV file</div>
+      <div style="color:#475569;font-size:12px;margin-top:4px">or drag and drop here</div>
+      <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCsvFile(this.files[0])"/>
+    </div>
+    <div id="csv-preview" style="display:none;background:#1a2133;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#94a3b8"></div>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeImportCsv()">Cancel</button>
+      <button class="btn-primary" id="csv-import-btn" onclick="importCsv()" disabled style="opacity:0.4">Import leads</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="import-email-modal">
   <div class="modal">
     <div class="modal-title">Import lead from email</div>
@@ -544,6 +569,117 @@ async function disconnectGmail() {
   document.getElementById('poll-status').classList.remove('live');
   document.getElementById('gmail-btn').textContent = 'Connect Gmail';
   updateGmailModal();
+}
+
+
+function openImportCsv(){
+  document.getElementById('import-csv-modal').classList.add('open');
+  // Wire up drag and drop
+  const dz=document.getElementById('csv-drop-zone');
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('dragover');};
+  dz.ondragleave=()=>dz.classList.remove('dragover');
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.csv'))handleCsvFile(f);};
+}
+function closeImportCsv(){
+  document.getElementById('import-csv-modal').classList.remove('open');
+  document.getElementById('csv-file-input').value='';
+  document.getElementById('csv-drop-label').textContent='Click to choose a CSV file';
+  document.getElementById('csv-preview').style.display='none';
+  document.getElementById('csv-import-btn').disabled=true;
+  document.getElementById('csv-import-btn').style.opacity='0.4';
+  document.getElementById('csv-tag').value='';
+  window._csvRows=null;
+}
+function parseCsvLine(line){
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(cur.trim());cur='';}
+    else cur+=c;
+  }
+  result.push(cur.trim());
+  return result;
+}
+function handleCsvFile(file){
+  if(!file)return;
+  document.getElementById('csv-drop-label').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    const lines=text.split(/\r?\n/).filter(l=>l.trim());
+    if(lines.length<2){alert('CSV appears empty.');return;}
+    const headers=parseCsvLine(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,''));
+    const rows=[];
+    for(let i=1;i<lines.length;i++){
+      const vals=parseCsvLine(lines[i]);
+      if(vals.length<2||!vals[0])continue;
+      const row={};
+      headers.forEach((h,idx)=>{row[h]=vals[idx]||'';});
+      rows.push(row);
+    }
+    window._csvRows=rows;
+    window._csvHeaders=headers;
+    const preview=document.getElementById('csv-preview');
+    preview.style.display='block';
+    preview.innerHTML='<strong style="color:#e2e8f0">'+rows.length+' leads found</strong> &nbsp;&middot;&nbsp; Columns: '+headers.join(', ')+'<br><br><span style="color:#64748b">Preview: '+rows.slice(0,3).map(r=>(r.firstname||r.first_name||'')+' '+(r.lastname||r.last_name||'')+' &middot; '+(r.phone||r.primaryphone||'')).join(' &nbsp;|&nbsp; ')+'</span>';
+    document.getElementById('csv-import-btn').disabled=false;
+    document.getElementById('csv-import-btn').style.opacity='1';
+  };
+  reader.readAsText(file);
+}
+function mapCsvRow(row){
+  // Map common CSV column names to our schema
+  const g=(...keys)=>{for(const k of keys){const v=row[k.toLowerCase().replace(/[^a-z0-9]/g,'')];if(v)return v;}return '';};
+  return{
+    firstName:g('firstname','first_name','first'),
+    lastName:g('lastname','last_name','last'),
+    phone:g('phone','primaryphone','phonenumber','mobile','cell'),
+    email:g('email','emailaddress'),
+    state:g('state','st'),
+    zip:g('zip','zipcode','postalcode'),
+    age:g('age'),
+    ageRange:g('agerange','age_range'),
+    income:g('income','annualincome','hhi'),
+    household:g('householdsize','household','hhsize')?g('householdsize','household','hhsize')+' person household':'',
+    dob:g('dob','dateofbirth','birthdate'),
+    comments:g('comments','notes','comment'),
+    campaign:'',
+    price:'',
+    leadId:'',
+  };
+}
+async function importCsv(){
+  const rows=window._csvRows;
+  if(!rows||!rows.length){alert('No CSV loaded.');return;}
+  const tag=document.getElementById('csv-tag').value.trim();
+  const btn=document.getElementById('csv-import-btn');
+  btn.textContent='Importing...';btn.disabled=true;
+  let imported=0,dupes=0;
+  for(const row of rows){
+    const mapped=mapCsvRow(row);
+    if(!mapped.firstName&&!mapped.phone)continue;
+    // Skip if phone already exists
+    if(mapped.phone&&leads.find(l=>l.phone&&l.phone.replace(/\D/g,'')===(mapped.phone||'').replace(/\D/g,''))){{dupes++;continue;}}
+    const tags=tag?['new','custom:'+tag]:['new'];
+    const lead={
+      id:crypto.randomUUID(),
+      ...mapped,
+      receivedAt:new Date().toISOString(),
+      disposition:'new',
+      notes:'',
+      customDisp:JSON.stringify(tags),
+      customText:tag||'',
+      tags,
+    };
+    leads.unshift(lead);
+    await saveLead(lead);
+    imported++;
+  }
+  renderLeads();updateStats();
+  btn.textContent='Import leads';btn.disabled=false;
+  closeImportCsv();
+  alert(imported+' leads imported'+(dupes?' ('+dupes+' duplicates skipped)':'')+'.');
 }
 
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});

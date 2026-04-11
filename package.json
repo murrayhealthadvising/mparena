@@ -1,8 +1,1 @@
-{
-  "name": "mparena-crm",
-  "version": "1.0.0",
-  "dependencies": {
-    "imap": "^0.8.19",
-    "mailparser": "^3.6.9"
-  }
-}
+{"name":"mparena","version":"1.0.0","dependencies":{"imap":"^0.8.19","mailparser":"^3.6.5","@supabase/supabase-js":"^2.39.0","googleapis":"^131.0.0"}}

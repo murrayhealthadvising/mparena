@@ -124,6 +124,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
   <div class="logo">MParena</div>
   <div class="topbar-right">
     <span class="poll-status" id="poll-status">Not connected</span>
+    <button class="btn-primary" onclick="openAddLead()">+ Add lead</button>
     <button class="btn-ghost" onclick="openSetup()">Gmail setup</button>
   </div>
 </div>
@@ -173,7 +174,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
   <div class="modal">
     <div class="modal-title">Connect Gmail inbox</div>
     <div class="modal-sub">Your CRM will poll this inbox every 2 minutes for new lead emails from LeadArena.</div>
-    <input class="modal-input" id="gmail-addr" type="email" placeholder="leads@gmail.com"/>
+    <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Paste lead email to import instantly</div><textarea class="modal-input" id="paste-email" placeholder="Paste full LeadArena email text here..." style="min-height:90px;resize:vertical;font-size:13px;line-height:1.5"></textarea><button class="btn-primary" onclick="importFromEmail()" style="width:100%;margin-bottom:16px">Import from email</button><div style="border-top:1px solid #2a3347;padding-top:14px;margin-bottom:8px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px">Auto Gmail connection</div><input class="modal-input" id="gmail-addr" type="email" placeholder="leads@gmail.com"/>
     <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
     <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords → Select app: Mail</div>
     <div class="modal-row">
@@ -211,5 +212,6 @@ async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{metho
 const savedCreds=localStorage.getItem('mp_gmail');if(savedCreds){try{const{addr,pass}=JSON.parse(savedCreds);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}
 renderLeads();updateStats();
 </script>
+<div class="modal-bg" id="add-lead-modal"><div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto"><div class="modal-title" style="margin-bottom:14px">Add lead manually</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">First name</div><input class="modal-input" id="al-first" placeholder="First name" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Last name</div><input class="modal-input" id="al-last" placeholder="Last name" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Phone *</div><input class="modal-input" id="al-phone" placeholder="Phone number" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Email</div><input class="modal-input" id="al-email" placeholder="Email" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">State</div><input class="modal-input" id="al-state" placeholder="IL" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Zip</div><input class="modal-input" id="al-zip" placeholder="60601" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Age range</div><input class="modal-input" id="al-age" placeholder="25-64" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Income</div><input class="modal-input" id="al-income" placeholder="$30,000-$50,000" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Household</div><select class="modal-input" id="al-household" style="margin-bottom:0"><option value="">Select...</option><option value="Individual">Individual</option><option value="Family">Family</option><option value="Couple">Couple</option></select></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Lead cost ($)</div><input class="modal-input" id="al-price" placeholder="35" style="margin-bottom:0"/></div></div><div style="margin-bottom:10px"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Comments</div><input class="modal-input" id="al-comments" placeholder="e.g. health-for-moms" style="margin-bottom:0"/></div><div class="modal-row"><button class="btn-cancel" onclick="closeAddLead()">Cancel</button><button class="btn-primary" onclick="saveManualLead()">Add lead</button></div></div></div>
 </body>
 </html>

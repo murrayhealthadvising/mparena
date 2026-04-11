@@ -100,52 +100,45 @@ var TC = {
 var TL = {new:'New',callback:'Call back',noanswer:'No answer',missedapt:'Missed apt',
   pr:'PR \u2713',quoted:'Quoted',ghost:'Ghost'};
 
-function renderBkt() {
+function renderBkt(){
   var list=document.getElementById('bkt-list');
-  if(!list) return;
+  if(!list)return;
   var bl=bktLeads();
-  var bcl=document.getElementById('bcl'); if(bcl) bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');
-  var tcb=document.getElementById('tcb'); if(tcb) tcb.textContent=bl.length;
-  if(!bl.length) {
-    list.innerHTML='<div class="bkt-empty">No high priority leads in the last 7 days.<br><span style="font-size:12px;color:#475569">Leads with New, Call back, No answer, or Missed apt dispositions appear here.</span></div>';
-    return;
-  }
+  var bcl=document.getElementById('bcl');if(bcl)bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');
+  var tcb=document.getElementById('tcb');if(tcb)tcb.textContent=bl.length;
+  if(!bl.length){list.innerHTML='<div class="bkt-empty">No high priority leads in the last 7 days.</div>';return;}
   var rows=[];
-  for(var i=0;i<bl.length;i++) {
-    var l=bl[i], age=bktAge(l.receivedAt), keys=bktKeys(l);
+  for(var i=0;i<bl.length;i++){
+    var l=bl[i],age=bktAge(l.receivedAt),keys=bktKeys(l);
     var isDial=dialerActive&&dialerIdx<dialerQueue.length&&dialerQueue[dialerIdx].id===l.id;
     var ph=(l.phone||'').replace(/[^0-9]/g,'');
-    var fn=l.firstName||'', ln=l.lastName||'';
+    var fn=l.firstName||'',ln=l.lastName||'';
     var tagHtml='';
-    for(var k=0;k<keys.length;k++) {
-      tagHtml+='<span style="padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;'+TC[keys[k]]+'">'+TL[keys[k]]+'</span> ';
-    }
+    for(var k=0;k<keys.length;k++){tagHtml+='<span style="padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;'+TC[keys[k]]+'">'+TL[keys[k]]+'</span> ';}
     var noteVal=(l.notes||'').replace(/"/g,'&quot;');
-    rows.push(
-      '<div class="pc'+(isDial?' dialing':'')+'" id="pc-'+l.id+'">'
-      +'<div class="lead-avatar">'+initials(fn+' '+ln)+'</div>'
-      +'<div class="pc-body">'
-        +'<div class="pc-name">'+fn+' '+ln+'</div>'
-        +'<button class="lead-phone" onclick="copyPhone(\''+l.phone+'\')">'+formatPhone(l.phone)+' <span class="copy-hint">copy</span></button>'
-        +'<div class="pc-meta">'+(l.state||'')+(l.household?' \u00b7 '+l.household:'')+(l.income?' \u00b7 '+l.income:'')+(l.price?' \u00b7 $'+l.price+' lead':'')+'</div>'
-        +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">'+tagHtml+'</div>'
-        +'<textarea id="bkt-note-'+l.id+'" placeholder="Call notes..." oninput="bktSaveNote(\''+l.id+'\')" style="margin-top:10px;width:100%;background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:8px 10px;font-size:12px;resize:vertical;min-height:60px;outline:none;line-height:1.5;font-family:inherit">'+noteVal+'</textarea>'
-        +'<div id="bkt-saved-'+l.id+'" style="font-size:10px;color:#639922;height:14px"></div>'
-      +'</div>'
-      +'<div class="pc-r">'
-        +'<div class="'+age[1]+'">'+age[0]+'</div>'
-        +(l.price?'<div class="lead-cost">$'+l.price+' lead</div>':'')
-        +'<a class="btn-call" href="tel:'+ph+'" style="padding:6px 14px;font-size:12px">'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
-            +'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>'
-          +'</svg>Call</a>'
-      +'</div>'
-      +'</div>'
-    );
+    var card='<div class="pc'+(isDial?' dialing':'')+'" id="pc-'+l.id+'">';
+    card+='<div class="pc-top">';
+    card+='<div class="lead-avatar">'+initials(fn+' '+ln)+'</div>';
+    card+='<div class="pc-body">';
+    card+='<div class="pc-name">'+fn+' '+ln+'</div>';
+    card+='<button class="lead-phone" onclick="copyPhone(\''+l.phone+'\')">'+ formatPhone(l.phone)+' <span class="copy-hint">copy</span></button>';
+    card+='<div class="pc-meta">'+(l.state||'')+(l.household?' \u00b7 '+l.household:'')+(l.income?' \u00b7 '+l.income:'')+(l.price?' \u00b7 $'+l.price+' lead':'')+'</div>';
+    card+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">'+tagHtml+'</div>';
+    card+='</div>';
+    card+='<div class="pc-r">';
+    card+='<div class="'+age[1]+'">'+age[0]+'</div>';
+    if(l.price)card+='<div class="lead-cost">$'+l.price+' lead</div>';
+    card+='<a class="btn-call" href="tel:'+ph+'" style="padding:6px 14px;font-size:12px">';
+    card+='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+    card+='<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Call</a>';
+    card+='</div></div>';
+    card+='<div class="pc-notes">';
+    card+='<textarea id="bkt-note-'+l.id+'" placeholder="Call notes..." oninput="bktSaveNote(\''+l.id+'\')">'+ noteVal+'</textarea>';
+    card+='<div class="pc-saved" id="bkt-saved-'+l.id+'"></div></div></div>';
+    rows.push(card);
   }
   list.innerHTML=rows.join('');
 }
-
 function updTC() {
   var ta=document.getElementById('tca'); if(ta) ta.textContent=leads.length;
   var bl=bktLeads();

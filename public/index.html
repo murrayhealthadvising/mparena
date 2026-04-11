@@ -827,10 +827,10 @@ function bktAge(iso){
   return[Math.floor(d)+"d ago","age-r"];
 }
 function renderBkt(){
-  var list=document.getElementById("bkt-list");
+  var list=document.getElementById("bucket-list");
   if(!list)return;
   var bl=bktLeads();
-  var cl=document.getElementById("bcl");
+  var cl=document.getElementById("bucket-count-label");
   if(cl)cl.textContent=bl.length+(bl.length!==1?" leads":" lead");
   var tc=document.getElementById("tcb");
   if(tc)tc.textContent=bl.length;

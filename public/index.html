@@ -4,16 +4,37 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MParena CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
 body{background:#0f1117;color:#e2e8f0;min-height:100vh}
+.auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-box{background:#151821;border:1px solid #2a3347;border-radius:16px;padding:40px;width:100%;max-width:400px}
+.auth-logo{font-size:28px;font-weight:700;color:#378ADD;letter-spacing:0.5px;margin-bottom:6px}
+.auth-tagline{font-size:14px;color:#64748b;margin-bottom:32px}
+.auth-tabs{display:flex;margin-bottom:28px;border-bottom:1px solid #2a3347}
+.auth-tab{background:none;border:none;color:#64748b;font-size:14px;padding:10px 20px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.auth-tab.active{color:#378ADD;border-bottom-color:#378ADD;font-weight:600}
+.auth-input{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:12px 14px;font-size:14px;outline:none;width:100%;margin-bottom:12px;display:block}
+.auth-input:focus{border-color:#378ADD}
+.auth-input::placeholder{color:#64748b}
+.auth-btn{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:4px}
+.auth-btn:hover{background:#185FA5}
+.auth-btn:disabled{background:#2a3347;color:#64748b;cursor:not-allowed}
+.auth-error{background:#280a0a;border:1px solid #3a1010;border-radius:8px;color:#F09595;font-size:13px;padding:10px 14px;margin-bottom:12px;display:none}
+.auth-error.show{display:block}
+.app{display:none}
 .topbar{background:#151821;border-bottom:1px solid #1e2535;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{font-size:18px;font-weight:700;color:#378ADD;letter-spacing:0.5px}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.btn-primary{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:500;cursor:pointer}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.btn-primary{background:#378ADD;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer}
 .btn-primary:hover{background:#185FA5}
-.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2a3347;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2a3347;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer}
 .btn-ghost:hover{background:#1e2535;color:#e2e8f0}
+.user-pill{font-size:12px;color:#64748b;background:#1a2133;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px}
+.user-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
+.btn-signout{background:transparent;border:none;color:#64748b;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.btn-signout:hover{color:#F09595}
 .stats-bar{background:#151821;border-bottom:1px solid #1e2535;padding:10px 20px;display:flex;gap:12px;flex-wrap:wrap}
 .stat{background:#1a2133;border-radius:8px;padding:8px 16px;min-width:80px;text-align:center}
 .stat-num{font-size:20px;font-weight:700}
@@ -34,7 +55,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0}
 .lead-main{flex:1;min-width:0}
 .lead-name{font-size:15px;font-weight:600;color:#e2e8f0}
-.lead-phone{color:#378ADD;font-size:14px;font-weight:500;margin-top:2px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0}
+.lead-phone{color:#378ADD;font-size:14px;font-weight:500;margin-top:2px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0}
 .lead-phone:hover{color:#85B7EB}
 .copy-hint{font-size:10px;color:#64748b;opacity:0;transition:opacity 0.15s}
 .lead-phone:hover .copy-hint{opacity:1}
@@ -66,7 +87,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .info-val{font-size:13px;color:#e2e8f0}
 .section-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
 .disp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.disp-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:5px;letter-spacing:0.2px;user-select:none}
+.disp-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:5px;user-select:none}
 .disp-pill .pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .dp-new{background:#1a2133;color:#64748b;border-color:#2a3347}.dp-new .pdot{background:#64748b}
 .dp-new.active,.dp-new:hover{background:#22293a;border-color:#64748b}
@@ -100,8 +121,6 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .btn-call svg{width:14px;height:14px;flex-shrink:0}
 .new-tag{background:#0C447C;color:#85B7EB;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:middle}
 .empty-state{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;margin-right:6px}
-.status-dot.active{background:#639922}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:#151821;border:1px solid #2a3347;border-radius:14px;padding:28px;width:100%;max-width:480px;margin:20px}
@@ -115,158 +134,158 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .btn-cancel:hover{color:#e2e8f0}
 .poll-status{font-size:12px;padding:4px 10px;border-radius:6px;background:#1a2133;color:#64748b}
 .poll-status.live{background:#0d2006;color:#97C459}
+.saving-indicator{font-size:11px;color:#64748b;display:flex;align-items:center;gap:6px}
+.saving-dot{width:6px;height:6px;border-radius:50%;background:#378ADD;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 </style>
 </head>
 <body>
-
 <div class="copied-toast" id="copied-toast">Number copied!</div>
-<div class="topbar">
-  <div class="logo">MParena</div>
-  <div class="topbar-right">
-    <span class="poll-status" id="poll-status">Not connected</span>
-    <button class="btn-primary" onclick="openImportEmail()">Import email</button>
-    <button class="btn-primary" onclick="openAddLead()">+ Add lead</button>
-    <button class="btn-ghost" onclick="openSetup()">Gmail setup</button>
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">MParena</div>
+    <div class="auth-tagline">Your leads. Your castle.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign in</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create account</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <input class="auth-input" id="auth-email" type="email" placeholder="Email address"/>
+    <input class="auth-input" id="auth-password" type="password" placeholder="Password"/>
+    <div id="signup-name-row" style="display:none">
+      <input class="auth-input" id="auth-name" type="text" placeholder="Your name (e.g. Murray)"/>
+    </div>
+    <button class="auth-btn" id="auth-submit-btn" onclick="handleAuth()">Sign in</button>
   </div>
 </div>
-
-<div class="stats-bar">
-  <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-total">0</div><div class="stat-label">Total leads</div></div>
-  <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-new">0</div><div class="stat-label">Today</div></div>
-  <div class="stat"><div class="stat-num" style="color:#97C459" id="s-sold">0</div><div class="stat-label">Sold</div></div>
-  <div class="stat"><div class="stat-num" style="color:#5DCAA5" id="s-apt">0</div><div class="stat-label">Appointments</div></div>
-  <div class="stat"><div class="stat-num" style="color:#85B7EB" id="s-cb">0</div><div class="stat-label">Call backs</div></div>
-  <div class="stat"><div class="stat-num" style="color:#AFA9EC" id="s-pitched">0</div><div class="stat-label">Pitched</div></div>
-</div>
-
-<div class="filters">
-  <input id="search" placeholder="Search name, phone, email..." oninput="renderLeads()"/>
-  <select id="f-state" onchange="renderLeads()"><option value="">All states</option></select>
-  <select id="f-disp" onchange="renderLeads()">
-    <option value="">All dispositions</option>
-    <option value="new">New</option>
-    <option value="sold">Sold</option>
-    <option value="notinterested">Not interested</option>
-    <option value="callback">Call back</option>
-    <option value="noanswer">No answer</option>
-    <option value="badnum">Bad #</option>
-    <option value="appointment">Appointment</option>
-    <option value="pitched">Pitched</option>
-    <option value="missedapt">Missed apt</option>
-    <option value="custom">Custom</option>
-  </select>
-  <select id="f-household" onchange="renderLeads()">
-    <option value="">All households</option>
-    <option value="Individual">Individual</option>
-    <option value="Family">Family</option>
-    <option value="Couple">Couple</option>
-  </select>
-  <button class="btn-reset" onclick="resetFilters()">Reset</button>
-</div>
-
-<div class="count-bar">
-  <span id="count-label">0 leads</span>
-  <span id="last-check" style="font-size:11px;color:#64748b"></span>
-</div>
-
-<div class="leads-list" id="leads-list"></div>
-
-<div class="modal-bg" id="setup-modal">
-  <div class="modal">
-    <div class="modal-title">Connect Gmail inbox</div>
-    <div class="modal-sub">Your CRM will poll this inbox every 2 minutes for new LeadArena emails automatically.</div>
-    <input class="modal-input" id="gmail-addr" type="email" placeholder="leads@gmail.com"/>
-    <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
-    <div class="modal-row">
-      <button class="btn-cancel" onclick="closeSetup()">Cancel</button>
-      <button class="btn-primary" onclick="saveGmail()">Connect</button>
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="logo">MParena</div>
+    <div class="topbar-right">
+      <span class="poll-status" id="poll-status">Not connected</span>
+      <button class="btn-primary" onclick="openImportEmail()">Import email</button>
+      <button class="btn-primary" onclick="openAddLead()">+ Add lead</button>
+      <button class="btn-ghost" onclick="openSetup()">Gmail setup</button>
+      <div class="user-pill"><span class="user-dot"></span><span id="user-name-display">...</span></div>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
   </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-total">0</div><div class="stat-label">Total leads</div></div>
+    <div class="stat"><div class="stat-num" style="color:#378ADD" id="s-new">0</div><div class="stat-label">Today</div></div>
+    <div class="stat"><div class="stat-num" style="color:#97C459" id="s-sold">0</div><div class="stat-label">Sold</div></div>
+    <div class="stat"><div class="stat-num" style="color:#5DCAA5" id="s-apt">0</div><div class="stat-label">Appointments</div></div>
+    <div class="stat"><div class="stat-num" style="color:#85B7EB" id="s-cb">0</div><div class="stat-label">Call backs</div></div>
+    <div class="stat"><div class="stat-num" style="color:#AFA9EC" id="s-pitched">0</div><div class="stat-label">Pitched</div></div>
+  </div>
+  <div class="filters">
+    <input id="search" placeholder="Search name, phone, email..." oninput="renderLeads()"/>
+    <select id="f-state" onchange="renderLeads()"><option value="">All states</option></select>
+    <select id="f-disp" onchange="renderLeads()">
+      <option value="">All dispositions</option>
+      <option value="new">New</option><option value="sold">Sold</option>
+      <option value="notinterested">Not interested</option><option value="callback">Call back</option>
+      <option value="noanswer">No answer</option><option value="badnum">Bad #</option>
+      <option value="appointment">Appointment</option><option value="pitched">Pitched</option>
+      <option value="missedapt">Missed apt</option><option value="custom">Custom</option>
+    </select>
+    <select id="f-household" onchange="renderLeads()">
+      <option value="">All households</option>
+      <option value="Individual">Individual</option><option value="Family">Family</option><option value="Couple">Couple</option>
+    </select>
+    <button class="btn-reset" onclick="resetFilters()">Reset</button>
+  </div>
+  <div class="count-bar">
+    <span id="count-label">0 leads</span>
+    <span id="saving-status" class="saving-indicator" style="display:none"><span class="saving-dot"></span>Saving...</span>
+  </div>
+  <div class="leads-list" id="leads-list"></div>
 </div>
-
-<script>
-const DISPS=[{key:'new',label:'New',pill:'dp-new',badge:'d-new'},{key:'sold',label:'Sold',pill:'dp-sold',badge:'d-sold'},{key:'notinterested',label:'Not interested',pill:'dp-notinterested',badge:'d-notinterested'},{key:'callback',label:'Call back',pill:'dp-callback',badge:'d-callback'},{key:'noanswer',label:'No answer',pill:'dp-noanswer',badge:'d-noanswer'},{key:'badnum',label:'Bad #',pill:'dp-badnum',badge:'d-badnum'},{key:'appointment',label:'Appointment',pill:'dp-appointment',badge:'d-appointment'},{key:'pitched',label:'Pitched',pill:'dp-pitched',badge:'d-pitched'},{key:'missedapt',label:'Missed apt',pill:'dp-missedapt',badge:'d-missedapt'},{key:'custom',label:'Custom',pill:'dp-custom',badge:'d-custom'}];
-let leads=JSON.parse(localStorage.getItem('mp_leads')||'[]');
-let expanded=new Set();
-let noteTimers={};
-let pollInterval=null;
-function save(){localStorage.setItem('mp_leads',JSON.stringify(leads));}
-function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
-function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
-function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
-function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
-function copyPhone(phone){const d=(phone||'').replace(/\D/g,'');if(!d)return;navigator.clipboard.writeText(d).then(()=>{const t=document.getElementById('copied-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);});}
-function getFiltered(){const q=document.getElementById('search').value.toLowerCase();const st=document.getElementById('f-state').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
-function renderLeads(){const list=document.getElementById('leads-list');const filtered=getFiltered();document.getElementById('count-label').textContent=filtered.length+' lead'+(filtered.length!==1?'s':'');const states=[...new Set(leads.map(l=>l.state).filter(Boolean))].sort();const sel=document.getElementById('f-state');const cur=sel.value;sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}}>${s}</option>`).join('');if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet. Connect Gmail to start receiving leads automatically.</div>';return;}list.innerHTML=filtered.map(l=>{const isExp=expanded.has(l.id);const di=dispInfo(l.disposition);const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;return`<div class="lead-card${isExp?' expanded':''}" id="card-${l.id}"><div class="lead-top"><div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div><div class="lead-main"><div class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</div><button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button><div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}</div><span class="disp-badge ${di.badge}"><span class="dot"></span>${dispLabel}</span></div><div class="lead-right"><div class="lead-date">${fmtDate(l.receivedAt)}</div>${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}<button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button></div></div>${isExp?`<div class="lead-expanded"><div class="exp-grid"><div class="info-group"><div class="info-row"><span class="info-label">Household</span><span class="info-val">${l.household||'—'}</span></div><div class="info-row"><span class="info-label">Age range</span><span class="info-val">${l.ageRange||l.age||'—'}</span></div><div class="info-row"><span class="info-label">Income</span><span class="info-val">${l.income||'—'}</span></div><div class="info-row"><span class="info-label">DOB</span><span class="info-val">${l.dob||'—'}</span></div></div><div class="info-group"><div class="info-row"><span class="info-label">State / Zip</span><span class="info-val">${l.state||'—'} ${l.zip||''}</span></div><div class="info-row"><span class="info-label">Campaign</span><span class="info-val">${l.campaign||'—'}</span></div><div class="info-row"><span class="info-label">Comments</span><span class="info-val">${l.comments||'—'}</span></div></div></div><div class="section-label">Disposition</div><div class="disp-pills">${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}</div>${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Type custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)"/>`:''}<div class="section-label">Notes</div><textarea class="notes-area" id="notes-${l.id}" placeholder="Call notes, follow-up reminders, anything..." oninput="autoSaveNote('${l.id}')">${l.notes||''}</textarea><div class="notes-saved" id="saved-${l.id}"></div><div class="action-row"><a class="btn-call" href="tel:${(l.phone||'').replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Click to call</a></div></div>`:''}</div>`}).join('');}
-function toggleExpand(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);renderLeads();}
-function setDisp(id,val){const l=leads.find(x=>x.id===id);if(l){l.disposition=val;save();updateStats();renderLeads();}}
-function setCustomDisp(id,val){const l=leads.find(x=>x.id===id);if(l){l.customDisp=val;save();}}
-function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const ind=document.getElementById('saved-'+id);if(!ta)return;const l=leads.find(x=>x.id===id);if(!l)return;l.notes=ta.value;if(ind)ind.textContent='';clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(()=>{save();if(ind){ind.textContent='Saved';setTimeout(()=>{if(ind)ind.textContent='';},2000);}},800);}
-function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
-function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}
-function openSetup(){document.getElementById('setup-modal').classList.add('open');}
-function closeSetup(){document.getElementById('setup-modal').classList.remove('open');}
-function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
-function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);document.getElementById('poll-status').textContent='Live · polling every 2 min';document.getElementById('poll-status').classList.add('live');pollGmail(addr,pass);pollInterval=setInterval(()=>pollGmail(addr,pass),120000);}
-async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.emailMsgId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){leads.unshift(l);}}save();renderLeads();updateStats();}document.getElementById('last-check').textContent='Last checked: '+new Date().toLocaleTimeString();}catch(e){console.error('Poll error',e);}}
-const savedCreds=localStorage.getItem('mp_gmail');if(savedCreds){try{const{addr,pass}=JSON.parse(savedCreds);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}
-renderLeads();updateStats();
-
-function openAddLead(){document.getElementById('add-lead-modal').classList.add('open');}
-function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
-function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:'l'+Date.now()+Math.random().toString(36).slice(2,5),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);save();renderLeads();updateStats();closeAddLead();}
-function importFromEmail(){
-  const raw=document.getElementById('paste-email').value;
-  if(!raw.trim()){alert('Please paste the email text first.');return;}
-  // Parse stopping at next label (handles LeadArena's no-linebreak format)
-  const get=label=>{
-    const m=raw.match(new RegExp(label+':\\s*([^\\n\\r]+?)(?=\\s*[A-Z][a-zA-Z ]+:|$)',''));
-    if(m&&m[1].trim())return m[1].trim();
-    // fallback
-    const m2=raw.match(new RegExp(label+':\\s*([^\\n\\r<:]{1,60})','i'));
-    return m2?m2[1].trim():'';
-  };
-  const lead={
-    id:'l'+Date.now()+Math.random().toString(36).slice(2,5),
-    firstName:get('First Name'),lastName:get('Last Name'),
-    phone:get('Primary Phone'),email:get('Email'),
-    state:get('State'),zip:get('Zip'),
-    age:get('Age'),ageRange:get('Age Range'),
-    income:get('Income'),household:get('Household'),
-    dob:get('DOB')||get('Date of Birth'),
-    comments:get('Comments'),campaign:get('Name'),
-    price:get('Price'),leadId:get('Lead Id'),
-    receivedAt:new Date().toISOString(),
-    disposition:'new',notes:'',customDisp:''
-  };
-  if(!lead.firstName&&!lead.phone){alert('Could not find lead info — make sure you pasted the full email text.');return;}
-  leads.unshift(lead);save();renderLeads();updateStats();
-  document.getElementById('paste-email').value='';
-  // Close whichever modal is open
-  document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
-}
-function closeImportEmail(){document.getElementById('import-email-modal').classList.remove('open');document.getElementById('paste-email').value='';}
-function openAddLead(){document.getElementById('add-lead-modal').classList.add('open');}
-function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
-function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:'l'+Date.now()+Math.random().toString(36).slice(2,5),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);save();renderLeads();updateStats();closeAddLead();}
-function importFromEmail(){const raw=document.getElementById('paste-email').value;if(!raw.trim()){alert('Please paste the email text first.');return;}const get=label=>{const m=raw.match(new RegExp(label+':\\s*([^\\n\\r<]+)','i'));return m?m[1].trim():'';};const lead={id:'l'+Date.now()+Math.random().toString(36).slice(2,5),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:get('Price'),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};if(!lead.firstName&&!lead.phone){alert('Could not find lead info — make sure you pasted the full email text.');return;}leads.unshift(lead);save();renderLeads();updateStats();closeImportEmail();}
-
-function openImportEmail(){document.getElementById('import-email-modal').classList.add('open');}
-function closeImportEmail(){document.getElementById('import-email-modal').classList.remove('open');document.getElementById('paste-email').value='';}
-</script>
-<div class="modal-bg" id="add-lead-modal"><div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto"><div class="modal-title" style="margin-bottom:14px">Add lead manually</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">First name</div><input class="modal-input" id="al-first" placeholder="First name" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Last name</div><input class="modal-input" id="al-last" placeholder="Last name" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Phone *</div><input class="modal-input" id="al-phone" placeholder="Phone number" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Email</div><input class="modal-input" id="al-email" placeholder="Email" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">State</div><input class="modal-input" id="al-state" placeholder="IL" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Zip</div><input class="modal-input" id="al-zip" placeholder="60601" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Age range</div><input class="modal-input" id="al-age" placeholder="25-64" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Income</div><input class="modal-input" id="al-income" placeholder="$30,000-$50,000" style="margin-bottom:0"/></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Household</div><select class="modal-input" id="al-household" style="margin-bottom:0"><option value="">Select...</option><option value="Individual">Individual</option><option value="Family">Family</option><option value="Couple">Couple</option></select></div><div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Lead cost ($)</div><input class="modal-input" id="al-price" placeholder="35" style="margin-bottom:0"/></div></div><div style="margin-bottom:10px"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Comments</div><input class="modal-input" id="al-comments" placeholder="e.g. health-for-moms" style="margin-bottom:0"/></div><div class="modal-row"><button class="btn-cancel" onclick="closeAddLead()">Cancel</button><button class="btn-primary" onclick="saveManualLead()">Add lead</button></div></div></div>
-
 <div class="modal-bg" id="import-email-modal">
   <div class="modal">
     <div class="modal-title">Import lead from email</div>
-    <div class="modal-sub">Copy the full text of a LeadArena email and paste it below. All fields will be auto-filled.</div>
-    <textarea class="modal-input" id="paste-email" placeholder="Paste the full lead email text here..." style="min-height:140px;resize:vertical;font-size:13px;line-height:1.6"></textarea>
+    <div class="modal-sub">Paste the full text of a LeadArena email — all fields pulled automatically.</div>
+    <textarea class="modal-input" id="paste-email" placeholder="Paste full email text here..." style="min-height:150px;resize:vertical;font-size:13px;line-height:1.6"></textarea>
     <div class="modal-row">
       <button class="btn-cancel" onclick="closeImportEmail()">Cancel</button>
       <button class="btn-primary" onclick="importFromEmail()">Import lead</button>
     </div>
   </div>
 </div>
+<div class="modal-bg" id="add-lead-modal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title" style="margin-bottom:14px">Add lead manually</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">First name</div><input class="modal-input" id="al-first" placeholder="First name" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Last name</div><input class="modal-input" id="al-last" placeholder="Last name" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Phone *</div><input class="modal-input" id="al-phone" placeholder="Phone number" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Email</div><input class="modal-input" id="al-email" placeholder="Email" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">State</div><input class="modal-input" id="al-state" placeholder="IL" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Zip</div><input class="modal-input" id="al-zip" placeholder="60601" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Age range</div><input class="modal-input" id="al-age" placeholder="25-64" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Income</div><input class="modal-input" id="al-income" placeholder="$30,000-$50,000" style="margin-bottom:0"/></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Household</div><select class="modal-input" id="al-household" style="margin-bottom:0"><option value="">Select...</option><option value="Individual">Individual</option><option value="Family">Family</option><option value="Couple">Couple</option></select></div>
+      <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Lead cost ($)</div><input class="modal-input" id="al-price" placeholder="35" style="margin-bottom:0"/></div>
+    </div>
+    <div style="margin-bottom:10px"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Comments</div><input class="modal-input" id="al-comments" placeholder="e.g. health-for-moms" style="margin-bottom:0"/></div>
+    <div class="modal-row"><button class="btn-cancel" onclick="closeAddLead()">Cancel</button><button class="btn-primary" onclick="saveManualLead()">Add lead</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="setup-modal">
+  <div class="modal">
+    <div class="modal-title">Connect Gmail inbox</div>
+    <div class="modal-sub">Auto-import LeadArena emails every 2 minutes.</div>
+    <input class="modal-input" id="gmail-addr" type="email" placeholder="mparena.murray@gmail.com"/>
+    <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
+    <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
+    <div class="modal-row"><button class="btn-cancel" onclick="closeSetup()">Cancel</button><button class="btn-primary" onclick="saveGmail()">Connect</button></div>
+  </div>
+</div>
+<script>
+const SUPABASE_URL='https://rgezxiouusvfutabpwkw.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnZXp4aW91dXN2ZnV0YWJwd2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4ODk2ODYsImV4cCI6MjA5MTQ2NTY4Nn0.zY5H878qZiTrYK4dZ3Vb3NkzfojLlyMOfYsISOa2eKI';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const DISPS=[{key:'new',label:'New',pill:'dp-new',badge:'d-new'},{key:'sold',label:'Sold',pill:'dp-sold',badge:'d-sold'},{key:'notinterested',label:'Not interested',pill:'dp-notinterested',badge:'d-notinterested'},{key:'callback',label:'Call back',pill:'dp-callback',badge:'d-callback'},{key:'noanswer',label:'No answer',pill:'dp-noanswer',badge:'d-noanswer'},{key:'badnum',label:'Bad #',pill:'dp-badnum',badge:'d-badnum'},{key:'appointment',label:'Appointment',pill:'dp-appointment',badge:'d-appointment'},{key:'pitched',label:'Pitched',pill:'dp-pitched',badge:'d-pitched'},{key:'missedapt',label:'Missed apt',pill:'dp-missedapt',badge:'d-missedapt'},{key:'custom',label:'Custom',pill:'dp-custom',badge:'d-custom'}];
+let currentUser=null,leads=[],expanded=new Set(),noteTimers={},pollInterval=null,authMode='signin';
+function switchTab(mode){authMode=mode;document.getElementById('tab-signin').classList.toggle('active',mode==='signin');document.getElementById('tab-signup').classList.toggle('active',mode==='signup');document.getElementById('signup-name-row').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign in':'Create account';document.getElementById('auth-error').classList.remove('show');}
+async function handleAuth(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const btn=document.getElementById('auth-submit-btn');if(!email||!password){showAuthError('Please enter your email and password.');return;}btn.disabled=true;btn.textContent=authMode==='signin'?'Signing in...':'Creating account...';document.getElementById('auth-error').classList.remove('show');if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Sign in';return;}await onSignedIn(data.user);}else{const name=document.getElementById('auth-name').value.trim()||email.split('@')[0];const{data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Create account';return;}if(data.user&&!data.session){showAuthError('Check your email to confirm, then sign in.');btn.disabled=false;btn.textContent='Create account';return;}await onSignedIn(data.user);}}
+function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
+async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();}
+async function signOut(){if(pollInterval)clearInterval(pollInterval);await sb.auth.signOut();currentUser=null;leads=[];expanded.clear();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('auth-submit-btn').disabled=false;document.getElementById('auth-submit-btn').textContent='Sign in';}
+async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error('Load:',error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',customDisp:r.custom_disp||''}));renderLeads();updateStats();}
+async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error('Save:',error);showSaving(false);}
+async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error('Update:',error);}
+function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
+function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
+function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
+function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
+function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function copyPhone(phone){const d=(phone||'').replace(/\D/g,'');if(!d)return;navigator.clipboard.writeText(d).then(()=>{const t=document.getElementById('copied-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);});}
+function parsePrice(raw){if(!raw)return'';const m=raw.match(/[\d.]+/);return m?m[0]:raw;}
+function parseLeadEmail(raw){const get=label=>{const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const m=raw.match(new RegExp(esc+':\\s*([^\\n\\r]+?)(?=\\s{0,3}[A-Z][a-zA-Z ]+ :|\\s{0,3}[A-Z][a-zA-Z]+:|$)',''));if(m&&m[1].trim())return m[1].trim();return'';};return{id:crypto.randomUUID(),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:parsePrice(get('Price')),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};}
+function getFiltered(){const q=document.getElementById('search').value.toLowerCase();const st=document.getElementById('f-state').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
+function renderLeads(){const list=document.getElementById('leads-list');const filtered=getFiltered();document.getElementById('count-label').textContent=filtered.length+' lead'+(filtered.length!==1?'s':'');const states=[...new Set(leads.map(l=>l.state).filter(Boolean))].sort();const sel=document.getElementById('f-state');const cur=sel.value;sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet — click Import email or + Add lead.</div>';return;}list.innerHTML=filtered.map(l=>{const isExp=expanded.has(l.id);const di=dispInfo(l.disposition);const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;return`<div class="lead-card${isExp?' expanded':''}" id="card-${l.id}"><div class="lead-top"><div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div><div class="lead-main"><div class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</div><button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button><div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}</div><span class="disp-badge ${di.badge}"><span class="dot"></span>${dispLabel}</span></div><div class="lead-right"><div class="lead-date">${fmtDate(l.receivedAt)}</div>${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}<button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button></div></div>${isExp?`<div class="lead-expanded"><div class="exp-grid"><div class="info-group"><div class="info-row"><span class="info-label">Household</span><span class="info-val">${l.household||'—'}</span></div><div class="info-row"><span class="info-label">Age range</span><span class="info-val">${l.ageRange||l.age||'—'}</span></div><div class="info-row"><span class="info-label">Income</span><span class="info-val">${l.income||'—'}</span></div><div class="info-row"><span class="info-label">DOB</span><span class="info-val">${l.dob||'—'}</span></div></div><div class="info-group"><div class="info-row"><span class="info-label">State / Zip</span><span class="info-val">${l.state||'—'} ${l.zip||''}</span></div><div class="info-row"><span class="info-label">Campaign</span><span class="info-val">${l.campaign||'—'}</span></div><div class="info-row"><span class="info-label">Comments</span><span class="info-val">${l.comments||'—'}</span></div></div></div><div class="section-label">Disposition</div><div class="disp-pills">${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}</div>${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Type custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)"/>`:''}<div class="section-label">Notes</div><textarea class="notes-area" id="notes-${l.id}" placeholder="Call notes, follow-up reminders, anything..." oninput="autoSaveNote('${l.id}')">${l.notes||''}</textarea><div class="notes-saved" id="saved-${l.id}"></div><div class="action-row"><a class="btn-call" href="tel:${(l.phone||'').replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Click to call</a></div></div>`:''}></div>`}).join('');}
+function toggleExpand(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);renderLeads();}
+async function setDisp(id,val){const l=leads.find(x=>x.id===id);if(!l)return;l.disposition=val;updateStats();renderLeads();await updateField(id,{disposition:val});}
+async function setCustomDisp(id,val){const l=leads.find(x=>x.id===id);if(!l)return;l.customDisp=val;await updateField(id,{custom_disp:val});}
+function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const ind=document.getElementById('saved-'+id);if(!ta)return;const l=leads.find(x=>x.id===id);if(!l)return;l.notes=ta.value;if(ind)ind.textContent='';clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(async()=>{await updateField(id,{notes:l.notes});if(ind){ind.textContent='Saved ✓';setTimeout(()=>{if(ind)ind.textContent='';},2000);}},800);}
+function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
+function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}
+function openImportEmail(){document.getElementById('import-email-modal').classList.add('open');}
+function closeImportEmail(){document.getElementById('import-email-modal').classList.remove('open');document.getElementById('paste-email').value='';}
+function openAddLead(){document.getElementById('add-lead-modal').classList.add('open');}
+function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function openSetup(){document.getElementById('setup-modal').classList.add('open');}
+function closeSetup(){document.getElementById('setup-modal').classList.remove('open');}
+async function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:crypto.randomUUID(),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);renderLeads();updateStats();closeAddLead();await saveLead(lead);}
+async function importFromEmail(){const raw=document.getElementById('paste-email').value;if(!raw.trim()){alert('Please paste the email text first.');return;}const lead=parseLeadEmail(raw);if(!lead.firstName&&!lead.phone){alert('Could not find lead info — paste the full email text.');return;}leads.unshift(lead);renderLeads();updateStats();closeImportEmail();await saveLead(lead);}
+function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
+function restoreGmailPolling(){const saved=localStorage.getItem('mp_gmail');if(saved){try{const{addr,pass}=JSON.parse(saved);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}}
+function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);document.getElementById('poll-status').textContent='Live · polling every 2 min';document.getElementById('poll-status').classList.add('live');pollGmail(addr,pass);pollInterval=setInterval(()=>pollGmail(addr,pass),120000);}
+async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();}}catch(e){console.error('Poll:',e);}}
+document.getElementById('auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth();});
+document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('auth-password').focus();});
+sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
+</script>
 </body>
 </html>

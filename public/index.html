@@ -808,20 +808,21 @@ sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.use
     <div class="dl-name" id="dl-name">-</div>
     <div class="dl-sub" id="dl-sub">-</div>
   </div>
-  <textarea id="dl-notes" placeholder="Notes..." oninput="if(typeof dlNoteSave==='function')dlNoteSave()" style="flex:1;min-width:180px;max-width:320px;background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:8px 10px;font-size:12px;resize:none;height:52px;outline:none;line-height:1.4;font-family:inherit"></textarea><div class="dl-prog" id="dl-prog">0 / 0</div>
-  <div class="dl-btns">
-    <a class="dbtn dbtn-call" id="dl-call-btn" href="#">&#128222; Call</a>
-    <div style="display:flex;flex-direction:column;gap:4px">
-      <div style="font-size:10px;color:#64748b;text-align:center">After call:</div>
-      <div style="display:flex;gap:4px">
-        <button class="dbtn dbtn-disp" onclick="dialerDisp('callback')">CB</button>
-        <button class="dbtn dbtn-disp" onclick="dialerDisp('noanswer')">NA</button>
-        <button class="dbtn dbtn-disp" onclick="dialerDisp('sold')">Sold</button>
-        <button class="dbtn dbtn-disp" onclick="dialerDisp('notinterested')">NI</button>
-      </div>
-    </div>
-    <button class="dbtn dbtn-next" onclick="dialerNext()">Next &#8594;</button>
+  <textarea id="dl-notes" placeholder="Notes..." oninput="if(typeof dlNoteSave==='function')dlNoteSave()" style="flex:1;min-width:140px;max-width:260px;background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:8px 10px;font-size:12px;resize:none;height:52px;outline:none;line-height:1.4;font-family:inherit"></textarea>
+  <div id="dl-ready" class="dl-btns">
+    <div class="dl-prog" id="dl-prog">0 / 0</div>
+    <a class="dbtn dbtn-call" id="dl-call-btn" href="#" onclick="dialerCall(event)">&#128222; Call</a>
     <button class="dbtn dbtn-stop" onclick="stopDialer()">&#9632; Stop</button>
+  </div>
+  <div id="dl-logging" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+    <div style="font-size:11px;color:#97C459;font-weight:600;white-space:nowrap">How did it go?</div>
+    <button class="dbtn" style="background:#042C53;color:#85B7EB;font-size:12px;padding:8px 12px" onclick="callLog('callback')">&#128222; CB</button>
+    <button class="dbtn" style="background:#2a1f08;color:#EF9F27;font-size:12px;padding:8px 12px" onclick="callLog('noanswer')">No ans</button>
+    <button class="dbtn" style="background:#173404;color:#97C459;font-size:12px;padding:8px 12px" onclick="callLog('sold')">Sold &#10003;</button>
+    <button class="dbtn" style="background:#3a1010;color:#F09595;font-size:12px;padding:8px 12px" onclick="callLog('notinterested')">NI</button>
+    <button class="dbtn" style="background:#04342C;color:#5DCAA5;font-size:12px;padding:8px 12px" onclick="callLog('appointment')">Apt</button>
+    <button class="dbtn" style="background:#1a1540;color:#AFA9EC;font-size:12px;padding:8px 12px" onclick="callLog('pitched')">VM</button>
+    <button class="dbtn" style="background:#2a3347;color:#94a3b8;font-size:12px;padding:8px 12px" onclick="callLog(null)">Skip</button>
   </div>
 </div>
 <script src="/bucket.js"></script>

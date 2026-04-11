@@ -246,31 +246,25 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 </div>
 <div class="modal-bg" id="setup-modal">
   <div class="modal">
-    <div class="modal-title">Connect Gmail</div>
-    <div class="modal-sub" id="gmail-modal-sub">Connect your leads Gmail so new LeadArena emails appear in MParena automatically — within seconds of arriving.</div>
-    <div id="gmail-oauth-section">
-      <button class="btn-primary" id="connect-gmail-btn" onclick="connectGmailOAuth()" style="width:100%;margin-bottom:16px;padding:12px;font-size:14px">
-        Connect Gmail automatically
-      </button>
-      <div style="text-align:center;font-size:12px;color:#64748b;margin-bottom:16px">or connect manually with app password</div>
-    </div>
-    <div id="gmail-manual-section" style="border-top:1px solid #2a3347;padding-top:16px">
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Manual connection</div>
-      <input class="modal-input" id="gmail-addr" type="email" placeholder="mparena.murray@gmail.com"/>
+    <div class="modal-title" id="gmail-modal-title">Connect Gmail</div>
+    <div id="gmail-disconnected-view">
+      <div class="modal-sub">Connect the Gmail that receives your LeadArena leads. New emails from <strong style="color:#e2e8f0">leads@ushamarketplace.com</strong> will appear in MParena automatically within seconds.</div>
+      <button class="btn-primary" onclick="connectGmailOAuth()" style="width:100%;padding:12px;font-size:14px;margin-bottom:20px">Connect Gmail automatically &rarr;</button>
+      <div style="text-align:center;font-size:12px;color:#475569;margin-bottom:16px">or use an app password</div>
+      <input class="modal-input" id="gmail-addr" type="email" placeholder="yourleads@gmail.com"/>
       <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
-      <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
+      <div class="modal-row"><button class="btn-cancel" onclick="closeSetup()">Cancel</button><button class="btn-primary" onclick="saveGmail()">Connect manually</button></div>
     </div>
-    <div id="gmail-connected-section" style="display:none;text-align:center;padding:16px 0">
-      <div style="font-size:32px;margin-bottom:8px">✓</div>
-      <div style="color:#97C459;font-weight:600;margin-bottom:4px" id="gmail-connected-addr"></div>
-      <div style="font-size:13px;color:#64748b">Gmail is connected. New LeadArena emails will appear automatically.</div>
-      <button class="btn-cancel" onclick="disconnectGmail()" style="margin-top:16px">Disconnect</button>
-    </div>
-    <div class="modal-row" id="gmail-modal-btns">
-      <button class="btn-cancel" onclick="closeSetup()">Cancel</button>
-      <button class="btn-primary" onclick="saveGmail()">Save manual</button>
+    <div id="gmail-connected-view" style="display:none;text-align:center;padding:8px 0">
+      <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
+      <div style="color:#97C459;font-weight:600;font-size:16px;margin-bottom:6px" id="gmail-connected-addr"></div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:24px">Connected. LeadArena emails appear automatically.</div>
+      <button class="btn-cancel" onclick="disconnectGmail()" style="border-color:#A32D2D;color:#F09595;width:100%;margin-bottom:12px">Disconnect &amp; use different account</button>
+      <button class="btn-cancel" onclick="closeSetup()">Close</button>
     </div>
   </div>
+</div></div>
 </div>
 <script>
 const SUPABASE_URL='https://rgezxiouusvfutabpwkw.supabase.co';
@@ -522,12 +516,15 @@ function handleGmailBtn() {
 
 function updateGmailModal() {
   const connected = window._gmailConnected;
-  document.getElementById('gmail-oauth-section').style.display = connected ? 'none' : 'block';
-  document.getElementById('gmail-manual-section').style.display = connected ? 'none' : 'block';
-  document.getElementById('gmail-connected-section').style.display = connected ? 'block' : 'none';
-  document.getElementById('gmail-modal-btns').style.display = connected ? 'none' : 'flex';
-  if (connected && window._gmailAddress) {
-    document.getElementById('gmail-connected-addr').textContent = window._gmailAddress;
+  const dv = document.getElementById('gmail-disconnected-view');
+  const cv = document.getElementById('gmail-connected-view');
+  const mt = document.getElementById('gmail-modal-title');
+  if(dv) dv.style.display = connected ? 'none' : 'block';
+  if(cv) cv.style.display = connected ? 'block' : 'none';
+  if(mt) mt.textContent = connected ? 'Gmail connected' : 'Connect Gmail';
+  if(connected && window._gmailAddress) {
+    const el = document.getElementById('gmail-connected-addr');
+    if(el) el.textContent = window._gmailAddress;
   }
 }
 
@@ -539,6 +536,7 @@ function connectGmailOAuth() {
 
 async function disconnectGmail() {
   if (!currentUser) return;
+  if(!confirm('Disconnect Gmail? You can reconnect a different account after.')) return;
   await sb.from('gmail_accounts').delete().eq('user_id', currentUser.id);
   window._gmailConnected = false;
   window._gmailAddress = null;
@@ -546,7 +544,6 @@ async function disconnectGmail() {
   document.getElementById('poll-status').classList.remove('live');
   document.getElementById('gmail-btn').textContent = 'Connect Gmail';
   updateGmailModal();
-  closeSetup();
 }
 
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});

@@ -178,10 +178,10 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
   <div class="topbar">
     <div class="logo">MParena</div>
     <div class="topbar-right">
-      <span class="poll-status" id="poll-status">Not connected</span>
+      <span class="poll-status" id="poll-status">Checking Gmail...</span>
       <button class="btn-primary" onclick="openImportEmail()">Import email</button>
       <button class="btn-primary" onclick="openAddLead()">+ Add lead</button>
-      <button class="btn-ghost" onclick="openSetup()">Gmail setup</button>
+      <button class="btn-ghost" id="gmail-btn" onclick="handleGmailBtn()">Gmail setup</button>
       <div class="user-pill"><span class="user-dot"></span><span id="user-name-display">...</span></div>
       <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
@@ -246,12 +246,30 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 </div>
 <div class="modal-bg" id="setup-modal">
   <div class="modal">
-    <div class="modal-title">Connect Gmail inbox</div>
-    <div class="modal-sub">Auto-import LeadArena emails every 2 minutes.</div>
-    <input class="modal-input" id="gmail-addr" type="email" placeholder="mparena.murray@gmail.com"/>
-    <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
-    <div style="font-size:11px;color:#64748b;margin-bottom:16px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
-    <div class="modal-row"><button class="btn-cancel" onclick="closeSetup()">Cancel</button><button class="btn-primary" onclick="saveGmail()">Connect</button></div>
+    <div class="modal-title">Connect Gmail</div>
+    <div class="modal-sub" id="gmail-modal-sub">Connect your leads Gmail so new LeadArena emails appear in MParena automatically — within seconds of arriving.</div>
+    <div id="gmail-oauth-section">
+      <button class="btn-primary" id="connect-gmail-btn" onclick="connectGmailOAuth()" style="width:100%;margin-bottom:16px;padding:12px;font-size:14px">
+        Connect Gmail automatically
+      </button>
+      <div style="text-align:center;font-size:12px;color:#64748b;margin-bottom:16px">or connect manually with app password</div>
+    </div>
+    <div id="gmail-manual-section" style="border-top:1px solid #2a3347;padding-top:16px">
+      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Manual connection</div>
+      <input class="modal-input" id="gmail-addr" type="email" placeholder="mparena.murray@gmail.com"/>
+      <input class="modal-input" id="gmail-pass" type="password" placeholder="App password — xxxx xxxx xxxx xxxx"/>
+      <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.6">Google Account → Security → 2-Step Verification → App passwords</div>
+    </div>
+    <div id="gmail-connected-section" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:32px;margin-bottom:8px">✓</div>
+      <div style="color:#97C459;font-weight:600;margin-bottom:4px" id="gmail-connected-addr"></div>
+      <div style="font-size:13px;color:#64748b">Gmail is connected. New LeadArena emails will appear automatically.</div>
+      <button class="btn-cancel" onclick="disconnectGmail()" style="margin-top:16px">Disconnect</button>
+    </div>
+    <div class="modal-row" id="gmail-modal-btns">
+      <button class="btn-cancel" onclick="closeSetup()">Cancel</button>
+      <button class="btn-primary" onclick="saveGmail()">Save manual</button>
+    </div>
   </div>
 </div>
 <script>
@@ -356,7 +374,7 @@ async function deleteLead(id,e){
 function switchTab(mode){authMode=mode;document.getElementById('tab-signin').classList.toggle('active',mode==='signin');document.getElementById('tab-signup').classList.toggle('active',mode==='signup');document.getElementById('signup-name-row').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign in':'Create account';document.getElementById('auth-error').classList.remove('show');}
 async function handleAuth(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const btn=document.getElementById('auth-submit-btn');if(!email||!password){showAuthError('Please enter your email and password.');return;}btn.disabled=true;btn.textContent=authMode==='signin'?'Signing in...':'Creating account...';document.getElementById('auth-error').classList.remove('show');if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Sign in';return;}await onSignedIn(data.user);}else{const name=document.getElementById('auth-name').value.trim()||email.split('@')[0];const{data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Create account';return;}if(data.user&&!data.session){showAuthError('Check your email to confirm, then sign in.');btn.disabled=false;btn.textContent='Create account';return;}await onSignedIn(data.user);}}
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
-async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();}
+async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();checkGmailConnection();}
 async function signOut(){if(pollInterval)clearInterval(pollInterval);await sb.auth.signOut();currentUser=null;leads=[];expanded.clear();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('auth-submit-btn').disabled=false;document.getElementById('auth-submit-btn').textContent='Sign in';}
 async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',
    customDisp:r.custom_disp||'',
@@ -477,6 +495,60 @@ function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);doc
 async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();}}catch(e){console.error(e);}}
 document.getElementById('auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth();});
 document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('auth-password').focus();});
+
+async function checkGmailConnection() {
+  if (!currentUser) return;
+  try {
+    const {data} = await sb.from('gmail_accounts').select('gmail_address').eq('user_id', currentUser.id).limit(1);
+    if (data?.length) {
+      document.getElementById('poll-status').textContent = 'Gmail ✓ ' + data[0].gmail_address.split('@')[0];
+      document.getElementById('poll-status').classList.add('live');
+      document.getElementById('gmail-btn').textContent = 'Gmail ✓';
+      window._gmailConnected = true;
+      window._gmailAddress = data[0].gmail_address;
+    } else {
+      document.getElementById('poll-status').textContent = 'Gmail not connected';
+      document.getElementById('poll-status').classList.remove('live');
+      document.getElementById('gmail-btn').textContent = 'Connect Gmail';
+      window._gmailConnected = false;
+    }
+  } catch(e) { console.error('Gmail check:', e); }
+}
+
+function handleGmailBtn() {
+  openSetup();
+  updateGmailModal();
+}
+
+function updateGmailModal() {
+  const connected = window._gmailConnected;
+  document.getElementById('gmail-oauth-section').style.display = connected ? 'none' : 'block';
+  document.getElementById('gmail-manual-section').style.display = connected ? 'none' : 'block';
+  document.getElementById('gmail-connected-section').style.display = connected ? 'block' : 'none';
+  document.getElementById('gmail-modal-btns').style.display = connected ? 'none' : 'flex';
+  if (connected && window._gmailAddress) {
+    document.getElementById('gmail-connected-addr').textContent = window._gmailAddress;
+  }
+}
+
+function connectGmailOAuth() {
+  if (!currentUser) return;
+  // Open OAuth flow in same window
+  window.location.href = '/api/gmail-auth?userId=' + currentUser.id;
+}
+
+async function disconnectGmail() {
+  if (!currentUser) return;
+  await sb.from('gmail_accounts').delete().eq('user_id', currentUser.id);
+  window._gmailConnected = false;
+  window._gmailAddress = null;
+  document.getElementById('poll-status').textContent = 'Gmail not connected';
+  document.getElementById('poll-status').classList.remove('live');
+  document.getElementById('gmail-btn').textContent = 'Connect Gmail';
+  updateGmailModal();
+  closeSetup();
+}
+
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
 </script>
 </body>

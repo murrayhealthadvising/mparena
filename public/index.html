@@ -49,12 +49,13 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .btn-reset:hover{color:#e2e8f0;border-color:#378ADD}
 .count-bar{padding:8px 20px;font-size:12px;color:#64748b;border-bottom:1px solid #1e2535;background:#151821;display:flex;justify-content:space-between;align-items:center}
 .leads-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
-.lead-card{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:border-color 0.15s}
-.lead-card.expanded{border-color:#378ADD}
+.lead-card{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:all 0.2s}
 .lead-top{display:flex;gap:14px;align-items:flex-start}
-.lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0}
+.lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0;margin-top:2px}
 .lead-main{flex:1;min-width:0}
+.lead-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lead-name{font-size:15px;font-weight:600;color:#e2e8f0}
+.lead-name-edit{font-size:15px;font-weight:600;color:#e2e8f0;background:#1a2133;border:1px solid #378ADD;border-radius:6px;padding:2px 8px;outline:none;width:200px}
 .lead-phone{color:#378ADD;font-size:14px;font-weight:500;margin-top:2px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0}
 .lead-phone:hover{color:#85B7EB}
 .copy-hint{font-size:10px;color:#64748b;opacity:0;transition:opacity 0.15s}
@@ -62,9 +63,13 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .copied-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none}
 .copied-toast.show{opacity:1}
 .lead-meta{font-size:12px;color:#64748b;margin-top:3px}
-.lead-right{text-align:right;flex-shrink:0}
+.lead-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .lead-date{font-size:11px;color:#64748b}
-.lead-cost{font-size:12px;color:#94a3b8;margin-top:3px}
+.lead-cost{font-size:12px;color:#94a3b8}
+.btn-edit{background:transparent;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer}
+.btn-edit:hover{color:#378ADD;border-color:#378ADD}
+.expand-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px}
+.expand-btn:hover{color:#378ADD;background:#1a2133}
 .disp-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px;letter-spacing:0.2px}
 .disp-badge .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .d-new{background:#1a2133;color:#64748b}.d-new .dot{background:#64748b}
@@ -77,18 +82,9 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .d-pitched{background:#1a1540;color:#AFA9EC}.d-pitched .dot{background:#7F77DD}
 .d-missedapt{background:#2a0f1c;color:#ED93B1}.d-missedapt .dot{background:#D4537E}
 .d-custom{background:#1a1a2e;color:#94a3b8}.d-custom .dot{background:#94a3b8}
-.expand-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px;margin-top:4px}
-.expand-btn:hover{color:#378ADD;background:#1a2133}
-.lead-expanded{margin-top:14px;border-top:1px solid #1e2535;padding-top:16px}
-.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.info-group{display:flex;flex-direction:column;gap:8px}
-.info-row{display:flex;flex-direction:column;gap:2px}
-.info-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px}
-.info-val{font-size:13px;color:#e2e8f0}
-.section-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
-.disp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.disp-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:5px;user-select:none}
-.disp-pill .pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.disp-pills-inline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #1e2535}
+.disp-pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:4px;user-select:none}
+.disp-pill .pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .dp-new{background:#1a2133;color:#64748b;border-color:#2a3347}.dp-new .pdot{background:#64748b}
 .dp-new.active,.dp-new:hover{background:#22293a;border-color:#64748b}
 .dp-sold{background:#0d2006;color:#97C459;border-color:#1a3a0a}.dp-sold .pdot{background:#97C459}
@@ -109,6 +105,14 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .dp-missedapt.active,.dp-missedapt:hover{background:#2a0f1c;border-color:#993556}
 .dp-custom{background:#111827;color:#94a3b8;border-color:#1e2535}.dp-custom .pdot{background:#94a3b8}
 .dp-custom.active,.dp-custom:hover{background:#1e2535;border-color:#64748b}
+.lead-expanded{margin-top:14px;border-top:1px solid #1e2535;padding-top:16px}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.info-group{display:flex;flex-direction:column;gap:8px}
+.info-row{display:flex;flex-direction:column;gap:2px}
+.info-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px}
+.info-val{font-size:13px;color:#e2e8f0}
+.info-edit{font-size:13px;color:#e2e8f0;background:#1a2133;border:1px solid #378ADD;border-radius:6px;padding:3px 8px;outline:none;width:100%}
+.section-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
 .custom-tag-input{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:7px 12px;font-size:13px;outline:none;width:180px;margin-bottom:14px;display:block}
 .custom-tag-input:focus{border-color:#378ADD}
 .notes-area{background:#1a2133;border:1px solid #2a3347;border-radius:10px;color:#e2e8f0;padding:14px;font-size:14px;width:100%;resize:vertical;min-height:120px;outline:none;line-height:1.6}
@@ -152,9 +156,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <div class="auth-error" id="auth-error"></div>
     <input class="auth-input" id="auth-email" type="email" placeholder="Email address"/>
     <input class="auth-input" id="auth-password" type="password" placeholder="Password"/>
-    <div id="signup-name-row" style="display:none">
-      <input class="auth-input" id="auth-name" type="text" placeholder="Your name (e.g. Murray)"/>
-    </div>
+    <div id="signup-name-row" style="display:none"><input class="auth-input" id="auth-name" type="text" placeholder="Your name (e.g. Murray)"/></div>
     <button class="auth-btn" id="auth-submit-btn" onclick="handleAuth()">Sign in</button>
   </div>
 </div>
@@ -245,8 +247,40 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 const SUPABASE_URL='https://rgezxiouusvfutabpwkw.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnZXp4aW91dXN2ZnV0YWJwd2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4ODk2ODYsImV4cCI6MjA5MTQ2NTY4Nn0.zY5H878qZiTrYK4dZ3Vb3NkzfojLlyMOfYsISOa2eKI';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
 const DISPS=[{key:'new',label:'New',pill:'dp-new',badge:'d-new'},{key:'sold',label:'Sold',pill:'dp-sold',badge:'d-sold'},{key:'notinterested',label:'Not interested',pill:'dp-notinterested',badge:'d-notinterested'},{key:'callback',label:'Call back',pill:'dp-callback',badge:'d-callback'},{key:'noanswer',label:'No answer',pill:'dp-noanswer',badge:'d-noanswer'},{key:'badnum',label:'Bad #',pill:'dp-badnum',badge:'d-badnum'},{key:'appointment',label:'Appointment',pill:'dp-appointment',badge:'d-appointment'},{key:'pitched',label:'Pitched',pill:'dp-pitched',badge:'d-pitched'},{key:'missedapt',label:'Missed apt',pill:'dp-missedapt',badge:'d-missedapt'},{key:'custom',label:'Custom',pill:'dp-custom',badge:'d-custom'}];
-let currentUser=null,leads=[],expanded=new Set(),noteTimers={},pollInterval=null,authMode='signin';
+
+const CARD_STYLE={new:'',sold:'border-color:#639922;background:#0d1a05',notinterested:'border-color:#A32D2D;background:#1a0505',callback:'border-color:#185FA5;background:#020f1f',noanswer:'border-color:#854F0B;background:#130d02',badnum:'border-color:#993C1D;background:#150804',appointment:'border-color:#0F6E56;background:#021410',pitched:'border-color:#534AB7;background:#0b0920',missedapt:'border-color:#993556;background:#120408',custom:'border-color:#64748b;background:#111827'};
+
+// Known field list for precise parsing
+const KNOWN_FIELDS=['First Name','Last Name','Primary Phone','Email','State','Zip','Age Range','Age','Income','Household','DOB','Date of Birth','Comments','Name','Price','Lead Id','Poverty Level','Gender','Height','Weight','Smoker','Address','City','Business Name','Secondary Phone','Alternate Phone','Other Emails','All Emails','All Phones','Current Carrier','Best Contact Time','Text Response','Lead Date','ISalesCRM Id','VSoft Id','Plan Choice','Monthly Budget','Prefered Start Date','Number Of Children','Spouse Age','employees','businessName','Business Website','Biz Verify Report','agentID'];
+
+function parseLeadEmail(raw){
+  const pattern=KNOWN_FIELDS.map(f=>f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+':').join('|');
+  const get=label=>{
+    const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const m=raw.match(new RegExp(esc+':([^:]+?)(?='+pattern+'|$)','i'));
+    return m?m[1].trim():'';
+  };
+  const priceM=raw.match(/Price:\s*\$?([\d.]+)/i);
+  return{
+    id:crypto.randomUUID(),
+    firstName:get('First Name'),lastName:get('Last Name'),
+    phone:get('Primary Phone'),email:get('Email'),
+    state:get('State'),zip:get('Zip'),
+    age:get('Age'),ageRange:get('Age Range'),
+    income:get('Income'),household:get('Household'),
+    dob:get('DOB')||get('Date of Birth'),
+    comments:get('Comments'),campaign:get('Name'),
+    price:priceM?priceM[1]:get('Price'),
+    leadId:get('Lead Id'),
+    receivedAt:new Date().toISOString(),
+    disposition:'new',notes:'',customDisp:''
+  };
+}
+
+let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,pollInterval=null,authMode='signin';
+
 function switchTab(mode){authMode=mode;document.getElementById('tab-signin').classList.toggle('active',mode==='signin');document.getElementById('tab-signup').classList.toggle('active',mode==='signup');document.getElementById('signup-name-row').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign in':'Create account';document.getElementById('auth-error').classList.remove('show');}
 async function handleAuth(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const btn=document.getElementById('auth-submit-btn');if(!email||!password){showAuthError('Please enter your email and password.');return;}btn.disabled=true;btn.textContent=authMode==='signin'?'Signing in...':'Creating account...';document.getElementById('auth-error').classList.remove('show');if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Sign in';return;}await onSignedIn(data.user);}else{const name=document.getElementById('auth-name').value.trim()||email.split('@')[0];const{data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Create account';return;}if(data.user&&!data.session){showAuthError('Check your email to confirm, then sign in.');btn.disabled=false;btn.textContent='Create account';return;}await onSignedIn(data.user);}}
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
@@ -258,16 +292,123 @@ async function updateField(id,fields){const{error}=await sb.from('leads').update
 function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
 function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
 function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
-function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
+function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
 function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
 function copyPhone(phone){const d=(phone||'').replace(/\D/g,'');if(!d)return;navigator.clipboard.writeText(d).then(()=>{const t=document.getElementById('copied-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);});}
-function parsePrice(raw){if(!raw)return'';const m=raw.match(/[\d.]+/);return m?m[0]:raw;}
-function parseLeadEmail(raw){const get=label=>{const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const m=raw.match(new RegExp(esc+':\\s*([^\\n\\r]+?)(?=\\s{0,3}[A-Z][a-zA-Z ]+ :|\\s{0,3}[A-Z][a-zA-Z]+:|$)',''));if(m&&m[1].trim())return m[1].trim();return'';};return{id:crypto.randomUUID(),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:parsePrice(get('Price')),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};}
 function getFiltered(){const q=document.getElementById('search').value.toLowerCase();const st=document.getElementById('f-state').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
-function renderLeads(){const list=document.getElementById('leads-list');const filtered=getFiltered();document.getElementById('count-label').textContent=filtered.length+' lead'+(filtered.length!==1?'s':'');const states=[...new Set(leads.map(l=>l.state).filter(Boolean))].sort();const sel=document.getElementById('f-state');const cur=sel.value;sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet — click Import email or + Add lead.</div>';return;}list.innerHTML=filtered.map(l=>{const isExp=expanded.has(l.id);const di=dispInfo(l.disposition);const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;return`<div class="lead-card${isExp?' expanded':''}" id="card-${l.id}"><div class="lead-top"><div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div><div class="lead-main"><div class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</div><button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button><div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}</div><span class="disp-badge ${di.badge}"><span class="dot"></span>${dispLabel}</span></div><div class="lead-right"><div class="lead-date">${fmtDate(l.receivedAt)}</div>${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}<button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button></div></div>${isExp?`<div class="lead-expanded"><div class="exp-grid"><div class="info-group"><div class="info-row"><span class="info-label">Household</span><span class="info-val">${l.household||'—'}</span></div><div class="info-row"><span class="info-label">Age range</span><span class="info-val">${l.ageRange||l.age||'—'}</span></div><div class="info-row"><span class="info-label">Income</span><span class="info-val">${l.income||'—'}</span></div><div class="info-row"><span class="info-label">DOB</span><span class="info-val">${l.dob||'—'}</span></div></div><div class="info-group"><div class="info-row"><span class="info-label">State / Zip</span><span class="info-val">${l.state||'—'} ${l.zip||''}</span></div><div class="info-row"><span class="info-label">Campaign</span><span class="info-val">${l.campaign||'—'}</span></div><div class="info-row"><span class="info-label">Comments</span><span class="info-val">${l.comments||'—'}</span></div></div></div><div class="section-label">Disposition</div><div class="disp-pills">${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}</div>${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Type custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)"/>`:''}<div class="section-label">Notes</div><textarea class="notes-area" id="notes-${l.id}" placeholder="Call notes, follow-up reminders, anything..." oninput="autoSaveNote('${l.id}')">${l.notes||''}</textarea><div class="notes-saved" id="saved-${l.id}"></div><div class="action-row"><a class="btn-call" href="tel:${(l.phone||'').replace(/\D/g,'')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Click to call</a></div></div>`:''}></div>`}).join('');}
+
+function renderLeads(){
+  const list=document.getElementById('leads-list');
+  const filtered=getFiltered();
+  document.getElementById('count-label').textContent=filtered.length+' lead'+(filtered.length!==1?'s':'');
+  const states=[...new Set(leads.map(l=>l.state).filter(Boolean))].sort();
+  const sel=document.getElementById('f-state');const cur=sel.value;
+  sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');
+  if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet — click Import email or + Add lead.</div>';return;}
+  const isEditing=editingId;
+  list.innerHTML=filtered.map(l=>{
+    const isExp=expanded.has(l.id);
+    const di=dispInfo(l.disposition);
+    const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();
+    const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;
+    const cardStyle=CARD_STYLE[l.disposition]||'';
+    const editing=isEditing===l.id;
+    return`<div class="lead-card" id="card-${l.id}" style="${cardStyle}">
+      <div class="lead-top">
+        <div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div>
+        <div class="lead-main">
+          <div class="lead-name-row">
+            ${editing
+              ? `<input class="lead-name-edit" id="edit-first-${l.id}" value="${l.firstName}" onblur="saveNameEdit('${l.id}')" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')"/> <input class="lead-name-edit" id="edit-last-${l.id}" value="${l.lastName}" onblur="saveNameEdit('${l.id}')" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')" style="width:140px"/>`
+              : `<span class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</span>`
+            }
+          </div>
+          <button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button>
+          <div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}${l.household?' · '+l.household:''}</div>
+          <div class="disp-pills-inline">
+            ${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}
+            ${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)" style="margin-bottom:0;width:130px"/>`:''}
+          </div>
+        </div>
+        <div class="lead-right">
+          <div class="lead-date">${fmtDate(l.receivedAt)}</div>
+          ${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}
+          <button class="btn-edit" onclick="startEdit('${l.id}')">${editing?'done':'edit'}</button>
+          <button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button>
+        </div>
+      </div>
+      ${isExp?`<div class="lead-expanded">
+        <div class="exp-grid">
+          <div class="info-group">
+            <div class="info-row"><span class="info-label">Phone</span>${editing?`<input class="info-edit" id="edit-phone-${l.id}" value="${l.phone}" onblur="saveFieldEdit('${l.id}','phone',this.value)"/>`:`<span class="info-val">${formatPhone(l.phone)}</span>`}</div>
+            <div class="info-row"><span class="info-label">Email</span>${editing?`<input class="info-edit" id="edit-email-${l.id}" value="${l.email}" onblur="saveFieldEdit('${l.id}','email',this.value)"/>`:`<span class="info-val">${l.email||'—'}</span>`}</div>
+            <div class="info-row"><span class="info-label">Household</span>${editing?`<input class="info-edit" value="${l.household}" onblur="saveFieldEdit('${l.id}','household',this.value)"/>`:`<span class="info-val">${l.household||'—'}</span>`}</div>
+            <div class="info-row"><span class="info-label">Age range</span>${editing?`<input class="info-edit" value="${l.ageRange}" onblur="saveFieldEdit('${l.id}','ageRange',this.value)"/>`:`<span class="info-val">${l.ageRange||l.age||'—'}</span>`}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-row"><span class="info-label">State / Zip</span>${editing?`<input class="info-edit" value="${l.state} ${l.zip}" onblur="saveStateZip('${l.id}',this.value)"/>`:`<span class="info-val">${l.state||'—'} ${l.zip||''}</span>`}</div>
+            <div class="info-row"><span class="info-label">Income</span>${editing?`<input class="info-edit" value="${l.income}" onblur="saveFieldEdit('${l.id}','income',this.value)"/>`:`<span class="info-val">${l.income||'—'}</span>`}</div>
+            <div class="info-row"><span class="info-label">DOB</span>${editing?`<input class="info-edit" value="${l.dob}" onblur="saveFieldEdit('${l.id}','dob',this.value)"/>`:`<span class="info-val">${l.dob||'—'}</span>`}</div>
+            <div class="info-row"><span class="info-label">Comments</span>${editing?`<input class="info-edit" value="${l.comments}" onblur="saveFieldEdit('${l.id}','comments',this.value)"/>`:`<span class="info-val">${l.comments||'—'}</span>`}</div>
+          </div>
+        </div>
+        <div class="section-label">Notes</div>
+        <textarea class="notes-area" id="notes-${l.id}" placeholder="Call notes, follow-up reminders, anything..." oninput="autoSaveNote('${l.id}')">${l.notes||''}</textarea>
+        <div class="notes-saved" id="saved-${l.id}"></div>
+        <div class="action-row">
+          <a class="btn-call" href="tel:${(l.phone||'').replace(/\D/g,'')}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Click to call
+          </a>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
 function toggleExpand(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);renderLeads();}
-async function setDisp(id,val){const l=leads.find(x=>x.id===id);if(!l)return;l.disposition=val;updateStats();renderLeads();await updateField(id,{disposition:val});}
-async function setCustomDisp(id,val){const l=leads.find(x=>x.id===id);if(!l)return;l.customDisp=val;await updateField(id,{custom_disp:val});}
+
+function startEdit(id){
+  editingId=editingId===id?null:id;
+  if(!expanded.has(id))expanded.add(id);
+  renderLeads();
+  if(editingId){setTimeout(()=>{const el=document.getElementById('edit-first-'+id);if(el)el.focus();},50);}
+}
+
+async function saveNameEdit(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  const first=document.getElementById('edit-first-'+id)?.value.trim()||l.firstName;
+  const last=document.getElementById('edit-last-'+id)?.value.trim()||l.lastName;
+  l.firstName=first;l.lastName=last;
+  await updateField(id,{first_name:first,last_name:last});
+}
+
+async function saveFieldEdit(id,field,val){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  l[field]=val.trim();
+  const dbField={phone:'phone',email:'email',household:'household',ageRange:'age_range',income:'income',dob:'dob',comments:'comments'}[field]||field;
+  await updateField(id,{[dbField]:val.trim()});
+}
+
+async function saveStateZip(id,val){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  const parts=val.trim().split(/\s+/);
+  l.state=parts[0]||'';l.zip=parts[1]||'';
+  await updateField(id,{state:l.state,zip:l.zip});
+}
+
+async function setDisp(id,val){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  l.disposition=val;updateStats();renderLeads();
+  await updateField(id,{disposition:val});
+}
+
+async function setCustomDisp(id,val){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  l.customDisp=val;
+  await updateField(id,{custom_disp:val});
+}
+
 function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const ind=document.getElementById('saved-'+id);if(!ta)return;const l=leads.find(x=>x.id===id);if(!l)return;l.notes=ta.value;if(ind)ind.textContent='';clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(async()=>{await updateField(id,{notes:l.notes});if(ind){ind.textContent='Saved ✓';setTimeout(()=>{if(ind)ind.textContent='';},2000);}},800);}
 function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
 function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}

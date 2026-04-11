@@ -70,6 +70,8 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .lead-cost{font-size:12px;color:#94a3b8}
 .btn-edit{background:transparent;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer}
 .btn-edit:hover{color:#378ADD;border-color:#378ADD}
+.btn-delete{background:transparent;border:none;color:#475569;font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;line-height:1}
+.btn-delete:hover{color:#F09595}
 .expand-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px}
 .expand-btn:hover{color:#378ADD}
 
@@ -302,18 +304,53 @@ function closeFlyout(){
   if(openFlyout){const el=document.getElementById('flyout-'+openFlyout);if(el)el.classList.remove('open');}
   openFlyout=null;
 }
+function getTagPrimary(tags){
+  const t=tags||[];
+  for(const p of ['sold','appointment','callback','pitched','missedapt','notinterested','noanswer','badnum','custom','new']){
+    if(t.includes(p)||t.some(x=>x.startsWith('custom:')))if(p==='custom'?t.some(x=>x.startsWith('custom:')):t.includes(p))return p;
+  }
+  return t[0]||'new';
+}
 async function pickDisp(id,val,e){
   e.stopPropagation();
-  closeFlyout();
   const l=leads.find(x=>x.id===id);if(!l)return;
-  l.disposition=val;
+  if(!l.tags)l.tags=[l.disposition||'new'];
+  if(l.tags.includes(val)){
+    // deselect - but keep at least one
+    if(l.tags.length>1)l.tags=l.tags.filter(t=>t!==val);
+  } else {
+    // if selecting 'new', clear everything else
+    if(val==='new'){l.tags=['new'];}
+    // if deselecting new implicitly when adding real tag
+    else{l.tags=l.tags.filter(t=>t!=='new');l.tags.push(val);}
+  }
+  l.disposition=getTagPrimary(l.tags);
+  const tagsJson=JSON.stringify(l.tags);
+  // keep customDisp for custom text, store tags in custom_disp as JSON if not custom text
+  if(!l.tags.some(t=>t.startsWith('custom:')))l.customDisp=tagsJson;
   updateStats();renderLeads();
-  await updateField(id,{disposition:val});
+  await updateField(id,{disposition:l.disposition,custom_disp:tagsJson});
 }
-async function pickCustomDisp(id,val){
+async function pickCustomDisp(id,val,e){
+  if(e)e.stopPropagation();
   const l=leads.find(x=>x.id===id);if(!l)return;
-  l.customDisp=val;
-  await updateField(id,{custom_disp:val});
+  l.customText=val;
+  // Update tags array with new custom label
+  if(!l.tags)l.tags=[];
+  l.tags=l.tags.filter(t=>!t.startsWith('custom:'));
+  if(val.trim())l.tags.push('custom:'+val.trim());
+  if(l.tags.length===0)l.tags=['new'];
+  l.disposition=getTagPrimary(l.tags);
+  l.customDisp=JSON.stringify(l.tags);
+  await updateField(id,{disposition:l.disposition,custom_disp:l.customDisp});
+}
+async function deleteLead(id,e){
+  e.stopPropagation();
+  if(!confirm('Delete this lead? This cannot be undone.'))return;
+  leads=leads.filter(x=>x.id!==id);
+  renderLeads();updateStats();
+  const{error}=await sb.from('leads').delete().eq('id',id).eq('user_id',currentUser.id);
+  if(error)console.error('Delete:',error);
 }
 
 function switchTab(mode){authMode=mode;document.getElementById('tab-signin').classList.toggle('active',mode==='signin');document.getElementById('tab-signup').classList.toggle('active',mode==='signup');document.getElementById('signup-name-row').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign in':'Create account';document.getElementById('auth-error').classList.remove('show');}
@@ -321,7 +358,11 @@ async function handleAuth(){const email=document.getElementById('auth-email').va
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
 async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();}
 async function signOut(){if(pollInterval)clearInterval(pollInterval);await sb.auth.signOut();currentUser=null;leads=[];expanded.clear();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('auth-submit-btn').disabled=false;document.getElementById('auth-submit-btn').textContent='Sign in';}
-async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',customDisp:r.custom_disp||''}));renderLeads();updateStats();}
+async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',
+   customDisp:r.custom_disp||'',
+   tags:(()=>{try{const t=JSON.parse(r.custom_disp);return Array.isArray(t)?t:[r.disposition||'new'];}catch(e){return[r.disposition||'new'];}})(),
+   customText:(()=>{try{const t=JSON.parse(r.custom_disp);if(Array.isArray(t)){const c=t.find(x=>x.startsWith('custom:'));return c?c.slice(7):'';}return r.custom_disp||'';}catch(e){return r.custom_disp||'';}})()
+  }));renderLeads();updateStats();}
 async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error(error);showSaving(false);}
 async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error(error);}
 function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
@@ -344,7 +385,11 @@ function renderLeads(){
     const isExp=expanded.has(l.id);
     const di=dispInfo(l.disposition);
     const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();
-    const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;
+    const tags=l.tags||[l.disposition||'new'];
+    const dispLabel=tags.map(t=>{
+      if(t.startsWith('custom:'))return t.slice(7);
+      return DISPS.find(d=>d.key===t)?.label||t;
+    }).join(' + ');
     const cardCls=CARD_CLASS[l.disposition]||'';
     const dotColor=DOT_COLOR[l.disposition]||'#64748b';
     const editing=editingId===l.id;
@@ -365,8 +410,11 @@ function renderLeads(){
               <span class="dot"></span>${dispLabel} <span class="arrow">▾</span>
             </span>
             <div class="disp-flyout" id="flyout-${l.id}">
-              ${DISPS.map(d=>`<div class="fp ${d.fp}${l.disposition===d.key?' sel':''}" onclick="pickDisp('${l.id}','${d.key}',event)"><span class="pdot"></span>${d.label}</div>`).join('')}
-              ${l.disposition==='custom'?`<input class="custom-tag-flyout" placeholder="Custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation()" oninput="pickCustomDisp('${l.id}',this.value)"/>`:''}
+              ${DISPS.map(d=>{const tags=l.tags||[l.disposition];const sel=tags.includes(d.key);return`<div class="fp ${d.fp}${sel?' sel':''}" onclick="pickDisp('${l.id}','${d.key}',event)"><span class="pdot"></span>${d.label}${sel?' ✓':''}</div>`;}).join('')}
+              <div style="width:100%;margin-top:6px;border-top:1px solid #2a3347;padding-top:8px;display:flex;gap:6px;align-items:center">
+                <input class="custom-tag-flyout" style="flex:1" placeholder="Custom label..." value="${(l.customText||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation()" oninput="l_customText_${l.id}=this.value" onblur="pickCustomDisp('${l.id}',this.value,event)" onkeydown="if(event.key==='Enter'){pickCustomDisp('${l.id}',this.value,event);closeFlyout();}"/>
+                <button style="background:#378ADD;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer" onclick="pickCustomDisp('${l.id}',this.previousElementSibling.value,event);closeFlyout()">Save</button>
+              </div>
             </div>
           </div>
         </div>
@@ -374,6 +422,7 @@ function renderLeads(){
           <div class="lead-date">${fmtDate(l.receivedAt)}</div>
           ${l.price?`<div class="lead-cost">$${l.price} lead</div>`:''}
           <button class="btn-edit" onclick="startEdit('${l.id}')">${editing?'done':'edit'}</button>
+          <button class="btn-delete" onclick="deleteLead('${l.id}',event)" title="Delete lead">🗑</button>
           <button class="expand-btn" onclick="toggleExpand('${l.id}')">${isExp?'▲':'▼'}</button>
         </div>
       </div>

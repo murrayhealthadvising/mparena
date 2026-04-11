@@ -254,11 +254,6 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <div class="stat"><div class="stat-num" style="color:#AFA9EC" id="s-pitched">0</div><div class="stat-label">Pitched</div></div>
   </div>
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('all')" id="tab-all">All leads <span class="tab-count" id="tc-all">0</span></button>
-    <button class="tab-btn" onclick="switchTab('bucket')" id="tab-bucket">&#128293; High Priority <span class="tab-count" id="tc-bucket">0</span></button>
-  </div>
-  <div class="tab-pane active" id="pane-all">
-  <div class="tab-nav">
     <button class="tab-btn active" id="tba" onclick="switchMainTab('all')">All leads <span class="tab-cnt" id="tca">0</span></button>
     <button class="tab-btn" id="tbb" onclick="switchMainTab('bucket')">&#128293; High Priority <span class="tab-cnt" id="tcb">0</span></button>
   </div>
@@ -788,12 +783,14 @@ async function importCsv(){
 var BX={sold:1,pitched:1,badnum:1,notinterested:1,appointment:1};
 var BAF={new:1,callback:1,noanswer:1,missedapt:1,pr:1,quoted:1,ghost:1};
 function switchMainTab(n){
-  ["all","bucket"].forEach(function(t){
-    var b=document.getElementById("tb"+t[0]);
-    var p=document.getElementById("pane-"+t);
-    if(b)b.classList.toggle("active",t===n);
-    if(p)p.classList.toggle("active",t===n);
-  });
+  var btnAll=document.getElementById("tba");
+  var btnBkt=document.getElementById("tbb");
+  var pAll=document.getElementById("pane-all");
+  var pBkt=document.getElementById("pane-bucket");
+  if(btnAll)btnAll.classList.toggle("active",n==="all");
+  if(btnBkt)btnBkt.classList.toggle("active",n==="bucket");
+  if(pAll)pAll.classList.toggle("active",n==="all");
+  if(pBkt)pBkt.classList.toggle("active",n==="bucket");
   if(n==="bucket")renderBkt();
 }
 function togBkt(tag,el){

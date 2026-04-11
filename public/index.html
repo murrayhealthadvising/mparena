@@ -600,7 +600,7 @@ function parseLeadEmail(raw){
   return{id:crypto.randomUUID(),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:priceM?priceM[1]:get('Price'),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};
 }
 
-let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,openFlyout=null,pollInterval=null,authMode='signin';
+let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,openFlyout=null,pollInterval=null;
 
 // Close flyout when clicking outside
 document.addEventListener('click',e=>{
@@ -1086,7 +1086,7 @@ function parseLeadEmail(raw){
   return{id:crypto.randomUUID(),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:priceM?priceM[1]:get('Price'),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};
 }
 
-let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,openFlyout=null,pollInterval=null,authMode='signin';
+let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,openFlyout=null,pollInterval=null;
 
 // Close flyout when clicking outside
 document.addEventListener('click',e=>{

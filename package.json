@@ -1,0 +1,8 @@
+{
+  "name": "mparena-crm",
+  "version": "1.0.0",
+  "dependencies": {
+    "imap": "^0.8.19",
+    "mailparser": "^3.6.9"
+  }
+}

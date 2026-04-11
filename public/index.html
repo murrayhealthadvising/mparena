@@ -82,31 +82,6 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .age-today{color:#97C459}
 .age-recent{color:#EF9F27}
 .age-old{color:#F0997B}
-.tab-nav{background:#151821;border-bottom:1px solid #1e2535;padding:0 20px;display:flex;gap:0}
-.tab-btn{background:none;border:none;color:#64748b;font-size:13px;font-weight:500;padding:12px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s}
-.tab-btn:hover{color:#e2e8f0}
-.tab-btn.active{color:#e2e8f0;border-bottom-color:#378ADD}
-.tab-cnt{display:inline-block;background:#1a2133;color:#64748b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:5px;vertical-align:middle}
-.tab-btn.active .tab-cnt{background:#378ADD;color:#fff}
-.tab-pane{display:none}.tab-pane.active{display:block}
-.bkt-hdr{padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between}
-.bkt-title{font-size:17px;font-weight:700;color:#e2e8f0}
-.bkt-sub{font-size:12px;color:#64748b;margin-top:2px}
-.bkt-pills{display:flex;gap:6px;flex-wrap:wrap;padding:10px 20px 0}
-.bkt-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid;cursor:pointer;transition:opacity 0.15s;user-select:none}
-.bkt-pill.off{opacity:0.35}
-.bkt-empty{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
-.pc{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:12px 14px;transition:border-color 0.15s;display:flex;gap:12px;align-items:flex-start}
-.pc:hover{border-color:#2a3347}
-.pc-body{flex:1;min-width:0}
-.pc-name{font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:1px}
-.pc-meta{font-size:12px;color:#64748b;margin-top:2px}
-.pc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
-.pc-r{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
-.age-g{color:#97C459;font-size:11px;font-weight:600}
-.age-y{color:#EF9F27;font-size:11px;font-weight:600}
-.age-r{color:#F0997B;font-size:11px;font-weight:600}
-.plist{padding:12px 20px;display:flex;flex-direction:column;gap:8px}
 .lead-card{border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:all 0.2s;background:#151821}
 .lead-top{display:flex;gap:14px;align-items:flex-start}
 .lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0;margin-top:2px}
@@ -213,6 +188,41 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 #csv-drop-zone:hover{border-color:#378ADD}
 #csv-drop-zone.dragover{border-color:#1D9E75;background:#021410}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.tab-nav{background:#151821;border-bottom:1px solid #1e2535;padding:0 20px;display:flex}
+.tab-btn{background:none;border:none;color:#64748b;font-size:13px;font-weight:500;padding:12px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab-btn:hover{color:#e2e8f0}
+.tab-btn.active{color:#e2e8f0;border-bottom-color:#378ADD}
+.tcnt{background:#1a2133;color:#64748b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:5px;vertical-align:middle}
+.tab-btn.active .tcnt{background:#378ADD;color:#fff}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.bkt-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid;cursor:pointer;user-select:none;transition:opacity 0.15s;display:inline-block;margin:0}
+.bkt-pill.off{opacity:0.3}
+.bkt-empty{text-align:center;padding:60px 20px;color:#64748b;font-size:14px}
+.pc{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transition:all 0.2s}
+.pc.dialing{border-color:#378ADD;background:#020e1c}
+.pc-body{flex:1;min-width:0}
+.pc-name{font-size:14px;font-weight:600;color:#e2e8f0}
+.pc-meta{font-size:12px;color:#64748b;margin-top:2px}
+.pc-r{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.age-g{color:#97C459;font-size:11px;font-weight:600}
+.age-y{color:#EF9F27;font-size:11px;font-weight:600}
+.age-r{color:#F0997B;font-size:11px;font-weight:600}
+.dialer-bar{position:fixed;bottom:0;left:0;right:0;background:#0d1117;border-top:2px solid #378ADD;padding:14px 24px;display:none;align-items:center;justify-content:space-between;z-index:300;gap:16px;flex-wrap:wrap}
+.dialer-bar.active{display:flex}
+.dl-info{min-width:0}
+.dl-name{font-size:16px;font-weight:700;color:#e2e8f0}
+.dl-sub{font-size:12px;color:#64748b;margin-top:2px}
+.dl-btns{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.dbtn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.dbtn-call{background:#378ADD;color:#fff}
+.dbtn-call:hover{background:#185FA5}
+.dbtn-next{background:#1a2133;color:#94a3b8;border:1px solid #2a3347}
+.dbtn-next:hover{color:#e2e8f0;background:#2a3347}
+.dbtn-disp{background:#1a2133;color:#64748b;border:1px solid #2a3347;font-size:11px;padding:6px 10px}
+.dbtn-stop{background:#3a1010;color:#F09595}
+.dbtn-stop:hover{background:#A32D2D;color:#fff}
+.dl-prog{font-size:12px;color:#64748b;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -254,8 +264,13 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <div class="stat"><div class="stat-num" style="color:#AFA9EC" id="s-pitched">0</div><div class="stat-label">Pitched</div></div>
   </div>
   <div class="tab-nav">
-    <button class="tab-btn active" id="tba" onclick="switchMainTab('all')">All leads <span class="tab-cnt" id="tca">0</span></button>
-    <button class="tab-btn" id="tbb" onclick="switchMainTab('bucket')">&#128293; High Priority <span class="tab-cnt" id="tcb">0</span></button>
+    <button class="tab-btn active" onclick="switchTab('all')" id="tab-all">All leads <span class="tab-count" id="tc-all">0</span></button>
+    <button class="tab-btn" onclick="switchTab('bucket')" id="tab-bucket">&#128293; High Priority <span class="tab-count" id="tc-bucket">0</span></button>
+  </div>
+  <div class="tab-pane active" id="pane-all">
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tba" onclick="switchMainTab('all')">All leads <span class="tcnt" id="tca">0</span></button>
+    <button class="tab-btn" id="tbb" onclick="switchMainTab('bucket')">&#128293; High Priority <span class="tcnt" id="tcb">0</span></button>
   </div>
   <div class="tab-pane active" id="pane-all">
   <div class="filters">
@@ -780,104 +795,29 @@ async function importCsv(){
 
 
 
-var BX={sold:1,pitched:1,badnum:1,notinterested:1,appointment:1};
-var BAF={new:1,callback:1,noanswer:1,missedapt:1,pr:1,quoted:1,ghost:1};
-function switchMainTab(n){
-  var btnAll=document.getElementById("tba");
-  var btnBkt=document.getElementById("tbb");
-  var pAll=document.getElementById("pane-all");
-  var pBkt=document.getElementById("pane-bucket");
-  if(btnAll)btnAll.classList.toggle("active",n==="all");
-  if(btnBkt)btnBkt.classList.toggle("active",n==="bucket");
-  if(pAll)pAll.classList.toggle("active",n==="all");
-  if(pBkt)pBkt.classList.toggle("active",n==="bucket");
-  if(n==="bucket")renderBkt();
-}
-function togBkt(tag,el){
-  if(BAF[tag]){delete BAF[tag];el.classList.add("off");}
-  else{BAF[tag]=1;el.classList.remove("off");}
-  renderBkt();
-}
-function bktKeys(l){
-  var d=l.disposition||"new";
-  var k=[];
-  if(!BX[d]){
-    if(d==="new"||d==="callback"||d==="noanswer"||d==="missedapt")k.push(d);
-  }
-  var txt=((l.tags||[d]).join(" ")+" "+(l.customText||"")).toLowerCase();
-  if(txt.indexOf("pr")!==-1||txt.indexOf("positive")!==-1)k.push("pr");
-  if(txt.indexOf("quot")!==-1)k.push("quoted");
-  if(txt.indexOf("ghost")!==-1)k.push("ghost");
-  return k;
-}
-function bktLeads(){
-  var cut=Date.now()-7*24*60*60*1000;
-  return leads.filter(function(l){
-    if(!l.receivedAt||new Date(l.receivedAt).getTime()<cut)return false;
-    if(BX[l.disposition])return false;
-    return bktKeys(l).some(function(k){return BAF[k];});
-  }).sort(function(a,b){return new Date(b.receivedAt)-new Date(a.receivedAt);});
-}
-function bktAge(iso){
-  var ms=Date.now()-new Date(iso).getTime();
-  var h=ms/3600000,d=ms/86400000;
-  if(h<24)return["Today","age-g"];
-  if(d<2)return["Yesterday","age-y"];
-  if(d<4)return[Math.floor(d)+"d ago","age-y"];
-  return[Math.floor(d)+"d ago","age-r"];
-}
-function renderBkt(){
-  var list=document.getElementById("bucket-list");
-  if(!list)return;
-  var bl=bktLeads();
-  var cl=document.getElementById("bucket-count-label");
-  if(cl)cl.textContent=bl.length+(bl.length!==1?" leads":" lead");
-  var tc=document.getElementById("tcb");
-  if(tc)tc.textContent=bl.length;
-  if(!bl.length){list.innerHTML="<div class=\"bkt-empty\">No high priority leads in the last 7 days.</div>";return;}
-  var TC={new:"color:#94a3b8;background:#1a2133",callback:"color:#85B7EB;background:#042C53",
-    noanswer:"color:#EF9F27;background:#2a1f08",missedapt:"color:#ED93B1;background:#2a0f1c",
-    pr:"color:#5DCAA5;background:#04342C",quoted:"color:#AFA9EC;background:#1a1540",
-    ghost:"color:#F0997B;background:#2d1508"};
-  var TL={new:"New",callback:"Call back",noanswer:"No answer",missedapt:"Missed apt",
-    pr:"PR ✓",quoted:"Quoted",ghost:"Ghost"};
-  var rows=[];
-  for(var i=0;i<bl.length;i++){
-    var l=bl[i];
-    var age=bktAge(l.receivedAt);
-    var keys=bktKeys(l);
-    var tags=keys.map(function(k){
-      return "<span style=\"padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;"+TC[k]+"\">"+TL[k]+"</span>";
-    }).join("");
-    var ph=(l.phone||"").replace(/[^0-9]/g,"");
-    var fn=l.firstName||"";var ln=l.lastName||"";
-    var row="<div class=\"pc\">"
-      +"<div class=\"lead-avatar\">"+initials(fn+" "+ln)+"</div>"
-      +"<div class=\"pc-body\">"
-        +"<div class=\"pc-name\">"+fn+" "+ln+"</div>"
-        +"<button class=\"lead-phone\" onclick=\"copyPhone('"+l.phone+"')\">"
-          +formatPhone(l.phone)+" <span class=\"copy-hint\">copy</span></button>"
-        +"<div class=\"pc-meta\">"+(l.state||"")+(l.household?" · "+l.household:"")+(l.income?" · "+l.income:"")+"</div>"
-        +"<div class=\"pc-tags\">"+tags+"</div>"
-      +"</div>"
-      +"<div class=\"pc-r\">"
-        +"<div class=\""+age[1]+"\">"+age[0]+"</div>"
-        +(l.price?"<div class=\"lead-cost\">$"+l.price+" lead</div>":"")
-        +"<a class=\"btn-call\" href=\"tel:"+ph+"\" style=\"padding:6px 14px;font-size:12px\">"
-          +"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">"
-            +"<path d=\"M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z\"/>"
-          +"</svg>Call</a>"
-      +"</div>"
-    +"</div>";
-    rows.push(row);
-  }
-  list.innerHTML=rows.join("");
-}
-function updTC(){
-  var ta=document.getElementById("tca");if(ta)ta.textContent=leads.length;
-  var tb=document.getElementById("tcb");if(tb)tb.textContent=bktLeads().length;
-}
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
 </script>
+<div class="dialer-bar" id="dialer-bar">
+  <div class="dl-info">
+    <div class="dl-name" id="dl-name">-</div>
+    <div class="dl-sub" id="dl-sub">-</div>
+  </div>
+  <div class="dl-prog" id="dl-prog">0 / 0</div>
+  <div class="dl-btns">
+    <a class="dbtn dbtn-call" id="dl-call-btn" href="#">&#128222; Call</a>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="font-size:10px;color:#64748b;text-align:center">After call:</div>
+      <div style="display:flex;gap:4px">
+        <button class="dbtn dbtn-disp" onclick="dialerDisp('callback')">CB</button>
+        <button class="dbtn dbtn-disp" onclick="dialerDisp('noanswer')">NA</button>
+        <button class="dbtn dbtn-disp" onclick="dialerDisp('sold')">Sold</button>
+        <button class="dbtn dbtn-disp" onclick="dialerDisp('notinterested')">NI</button>
+      </div>
+    </div>
+    <button class="dbtn dbtn-next" onclick="dialerNext()">Next &#8594;</button>
+    <button class="dbtn dbtn-stop" onclick="stopDialer()">&#9632; Stop</button>
+  </div>
+</div>
+<script src="/bucket.js"></script>
 </body>
 </html>

@@ -208,7 +208,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .age-g{color:#97C459;font-size:11px;font-weight:600}
 .age-y{color:#EF9F27;font-size:11px;font-weight:600}
 .age-r{color:#F0997B;font-size:11px;font-weight:600}
-.dialer-bar{position:fixed;bottom:0;left:0;right:0;background:#0d1117;border-top:2px solid #378ADD;padding:14px 24px;display:none;align-items:center;justify-content:space-between;z-index:300;gap:16px;flex-wrap:wrap}
+.dialer-bar{position:fixed;bottom:0;left:0;right:0;background:#0d1117;border-top:3px solid #378ADD;padding:16px 20px;display:none;align-items:center;justify-content:space-between;z-index:9999;gap:12px;flex-wrap:wrap;box-shadow:0 -4px 24px rgba(55,138,221,0.3)}
 .dialer-bar.active{display:flex}
 .dl-info{min-width:0}
 .dl-name{font-size:16px;font-weight:700;color:#e2e8f0}
@@ -481,7 +481,7 @@ async function deleteLead(id,e){
   e.stopPropagation();
   if(!confirm('Delete this lead? This cannot be undone.'))return;
   leads=leads.filter(x=>x.id!==id);
-  renderLeads();updateStats();updTC();updateTabCounts();
+  renderLeads();updateStats();if(typeof updTC==="function")updTC();updateTabCounts();
   const{error}=await sb.from('leads').delete().eq('id',id).eq('user_id',currentUser.id);
   if(error)console.error('Delete:',error);
 }
@@ -495,7 +495,7 @@ async function loadLeads(){const{data,error}=await sb.from('leads').select('*').
    customDisp:r.custom_disp||'',
    tags:(()=>{try{const t=JSON.parse(r.custom_disp);return Array.isArray(t)?t:[r.disposition||'new'];}catch(e){return[r.disposition||'new'];}})(),
    customText:(()=>{try{const t=JSON.parse(r.custom_disp);if(Array.isArray(t)){const c=t.find(x=>x.startsWith('custom:'));return c?c.slice(7):'';}return r.custom_disp||'';}catch(e){return r.custom_disp||'';}})()
-  }));renderLeads();updateStats();updTC();}
+  }));renderLeads();updateStats();if(typeof updTC==="function")updTC();}
 async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error(error);showSaving(false);}
 async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error(error);}
 function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
@@ -602,12 +602,12 @@ function openAddLead(){document.getElementById('add-lead-modal').classList.add('
 function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 function openSetup(){document.getElementById('setup-modal').classList.add('open');}
 function closeSetup(){document.getElementById('setup-modal').classList.remove('open');}
-async function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:crypto.randomUUID(),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);renderLeads();updateStats();updTC();closeAddLead();await saveLead(lead);}
-async function importFromEmail(){const raw=document.getElementById('paste-email').value;if(!raw.trim()){alert('Please paste the email text first.');return;}const lead=parseLeadEmail(raw);if(!lead.firstName&&!lead.phone){alert('Could not find lead info — paste the full email text.');return;}leads.unshift(lead);renderLeads();updateStats();updTC();closeImportEmail();await saveLead(lead);}
+async function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:crypto.randomUUID(),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);renderLeads();updateStats();if(typeof updTC==="function")updTC();closeAddLead();await saveLead(lead);}
+async function importFromEmail(){const raw=document.getElementById('paste-email').value;if(!raw.trim()){alert('Please paste the email text first.');return;}const lead=parseLeadEmail(raw);if(!lead.firstName&&!lead.phone){alert('Could not find lead info — paste the full email text.');return;}leads.unshift(lead);renderLeads();updateStats();if(typeof updTC==="function")updTC();closeImportEmail();await saveLead(lead);}
 function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
 function restoreGmailPolling(){const saved=localStorage.getItem('mp_gmail');if(saved){try{const{addr,pass}=JSON.parse(saved);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}}
 function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);document.getElementById('poll-status').textContent='Live · polling every 2 min';document.getElementById('poll-status').classList.add('live');pollGmail(addr,pass);pollInterval=setInterval(()=>pollGmail(addr,pass),120000);}
-async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();updTC();}}catch(e){console.error(e);}}
+async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();if(typeof updTC==="function")updTC();}}catch(e){console.error(e);}}
 document.getElementById('auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth();});
 document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('auth-password').focus();});
 
@@ -783,7 +783,7 @@ async function importCsv(){
     await saveLead(lead);
     imported++;
   }
-  renderLeads();updateStats();updTC();
+  renderLeads();updateStats();if(typeof updTC==="function")updTC();
   btn.textContent='Import leads';btn.disabled=false;
   closeImportCsv();
   const msg=['\u2713 '+imported+' leads imported'];
@@ -794,6 +794,12 @@ async function importCsv(){
 }
 
 
+
+
+function updTC(){var ta=document.getElementById('tca');if(ta)ta.textContent=leads.length;if(typeof bktLeads==='function'){var bl=bktLeads();var tb=document.getElementById('tcb');if(tb)tb.textContent=bl.length;}}
+function switchMainTab(n){var a=document.getElementById('tba'),b=document.getElementById('tbb'),pa=document.getElementById('pane-all'),pb=document.getElementById('pane-bucket');if(a)a.classList.toggle('active',n==='all');if(b)b.classList.toggle('active',n==='bucket');if(pa)pa.classList.toggle('active',n==='all');if(pb)pb.classList.toggle('active',n==='bucket');if(n==='bucket'&&typeof renderBkt==='function')renderBkt();}
+function startDialer(){if(typeof bktLeads!=='function'){alert('Page still loading, try again.');return;}var q=bktLeads();if(!q.length){alert('No leads in High Priority queue.');return;}dialerQueue=q;dialerIdx=0;dialerActive=true;document.getElementById('dialer-bar').classList.add('active');if(typeof dialerShow==='function')dialerShow();}
+var dialerQueue=[];var dialerIdx=0;var dialerActive=false;
 
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
 </script>

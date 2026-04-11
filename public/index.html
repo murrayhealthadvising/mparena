@@ -49,13 +49,15 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .btn-reset:hover{color:#e2e8f0;border-color:#378ADD}
 .count-bar{padding:8px 20px;font-size:12px;color:#64748b;border-bottom:1px solid #1e2535;background:#151821;display:flex;justify-content:space-between;align-items:center}
 .leads-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
-.lead-card{background:#151821;border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:all 0.2s}
+
+/* LEAD CARDS */
+.lead-card{border:1px solid #1e2535;border-radius:12px;padding:14px 16px;transition:all 0.2s;background:#151821}
 .lead-top{display:flex;gap:14px;align-items:flex-start}
 .lead-avatar{width:40px;height:40px;border-radius:50%;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#B5D4F4;flex-shrink:0;margin-top:2px}
 .lead-main{flex:1;min-width:0}
 .lead-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lead-name{font-size:15px;font-weight:600;color:#e2e8f0}
-.lead-name-edit{font-size:15px;font-weight:600;color:#e2e8f0;background:#1a2133;border:1px solid #378ADD;border-radius:6px;padding:2px 8px;outline:none;width:200px}
+.lead-name-edit{font-size:15px;font-weight:600;color:#e2e8f0;background:#1a2133;border:1px solid #378ADD;border-radius:6px;padding:2px 8px;outline:none;width:140px}
 .lead-phone{color:#378ADD;font-size:14px;font-weight:500;margin-top:2px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0}
 .lead-phone:hover{color:#85B7EB}
 .copy-hint{font-size:10px;color:#64748b;opacity:0;transition:opacity 0.15s}
@@ -69,43 +71,55 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .btn-edit{background:transparent;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer}
 .btn-edit:hover{color:#378ADD;border-color:#378ADD}
 .expand-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px}
-.expand-btn:hover{color:#378ADD;background:#1a2133}
-.disp-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px;letter-spacing:0.2px}
+.expand-btn:hover{color:#378ADD}
+
+/* DISPOSITION BADGE — single pill on card */
+.disp-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-top:6px;letter-spacing:0.2px;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;user-select:none}
 .disp-badge .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.d-new{background:#1a2133;color:#64748b}.d-new .dot{background:#64748b}
-.d-sold{background:#173404;color:#97C459}.d-sold .dot{background:#97C459}
-.d-notinterested{background:#3a1010;color:#F09595}.d-notinterested .dot{background:#E24B4A}
-.d-callback{background:#042C53;color:#85B7EB}.d-callback .dot{background:#378ADD}
-.d-noanswer{background:#2a1f08;color:#EF9F27}.d-noanswer .dot{background:#EF9F27}
-.d-badnum{background:#2d1508;color:#F0997B}.d-badnum .dot{background:#D85A30}
-.d-appointment{background:#04342C;color:#5DCAA5}.d-appointment .dot{background:#1D9E75}
-.d-pitched{background:#1a1540;color:#AFA9EC}.d-pitched .dot{background:#7F77DD}
-.d-missedapt{background:#2a0f1c;color:#ED93B1}.d-missedapt .dot{background:#D4537E}
-.d-custom{background:#1a1a2e;color:#94a3b8}.d-custom .dot{background:#94a3b8}
-.disp-pills-inline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #1e2535}
-.disp-pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:4px;user-select:none}
-.disp-pill .pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.dp-new{background:#1a2133;color:#64748b;border-color:#2a3347}.dp-new .pdot{background:#64748b}
-.dp-new.active,.dp-new:hover{background:#22293a;border-color:#64748b}
-.dp-sold{background:#0d2006;color:#97C459;border-color:#1a3a0a}.dp-sold .pdot{background:#97C459}
-.dp-sold.active,.dp-sold:hover{background:#173404;border-color:#639922}
-.dp-notinterested{background:#280a0a;color:#F09595;border-color:#3a1010}.dp-notinterested .pdot{background:#E24B4A}
-.dp-notinterested.active,.dp-notinterested:hover{background:#3a1010;border-color:#A32D2D}
-.dp-callback{background:#021a33;color:#85B7EB;border-color:#0a2a4a}.dp-callback .pdot{background:#378ADD}
-.dp-callback.active,.dp-callback:hover{background:#042C53;border-color:#185FA5}
-.dp-noanswer{background:#1a1204;color:#EF9F27;border-color:#2a1f08}.dp-noanswer .pdot{background:#EF9F27}
-.dp-noanswer.active,.dp-noanswer:hover{background:#2a1f08;border-color:#854F0B}
-.dp-badnum{background:#1f0d04;color:#F0997B;border-color:#2d1508}.dp-badnum .pdot{background:#D85A30}
-.dp-badnum.active,.dp-badnum:hover{background:#2d1508;border-color:#993C1D}
-.dp-appointment{background:#021f1a;color:#5DCAA5;border-color:#04342C}.dp-appointment .pdot{background:#1D9E75}
-.dp-appointment.active,.dp-appointment:hover{background:#04342C;border-color:#0F6E56}
-.dp-pitched{background:#100e2a;color:#AFA9EC;border-color:#1a1540}.dp-pitched .pdot{background:#7F77DD}
-.dp-pitched.active,.dp-pitched:hover{background:#1a1540;border-color:#534AB7}
-.dp-missedapt{background:#1a0810;color:#ED93B1;border-color:#2a0f1c}.dp-missedapt .pdot{background:#D4537E}
-.dp-missedapt.active,.dp-missedapt:hover{background:#2a0f1c;border-color:#993556}
-.dp-custom{background:#111827;color:#94a3b8;border-color:#1e2535}.dp-custom .pdot{background:#94a3b8}
-.dp-custom.active,.dp-custom:hover{background:#1e2535;border-color:#64748b}
-.lead-expanded{margin-top:14px;border-top:1px solid #1e2535;padding-top:16px}
+.disp-badge .arrow{font-size:9px;opacity:0.7;margin-left:2px}
+.d-new{background:#1a2133;color:#64748b;border-color:#2a3347}.d-new .dot{background:#64748b}
+.d-sold{background:#173404;color:#97C459;border-color:#639922}.d-sold .dot{background:#97C459}
+.d-notinterested{background:#3a1010;color:#F09595;border-color:#A32D2D}.d-notinterested .dot{background:#E24B4A}
+.d-callback{background:#042C53;color:#85B7EB;border-color:#185FA5}.d-callback .dot{background:#378ADD}
+.d-noanswer{background:#2a1f08;color:#EF9F27;border-color:#854F0B}.d-noanswer .dot{background:#EF9F27}
+.d-badnum{background:#2d1508;color:#F0997B;border-color:#993C1D}.d-badnum .dot{background:#D85A30}
+.d-appointment{background:#04342C;color:#5DCAA5;border-color:#0F6E56}.d-appointment .dot{background:#1D9E75}
+.d-pitched{background:#1a1540;color:#AFA9EC;border-color:#534AB7}.d-pitched .dot{background:#7F77DD}
+.d-missedapt{background:#2a0f1c;color:#ED93B1;border-color:#993556}.d-missedapt .dot{background:#D4537E}
+.d-custom{background:#1a1a2e;color:#94a3b8;border-color:#64748b}.d-custom .dot{background:#94a3b8}
+
+/* DISPOSITION FLYOUT */
+.disp-flyout{display:none;position:absolute;left:0;top:calc(100% + 6px);background:#151821;border:1px solid #2a3347;border-radius:12px;padding:10px;z-index:50;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);flex-wrap:wrap;gap:6px}
+.disp-flyout.open{display:flex}
+.disp-anchor{position:relative;display:inline-block}
+.fp{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.12s;display:inline-flex;align-items:center;gap:4px;user-select:none}
+.fp .pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.fp-new{background:#1a2133;color:#64748b;border-color:#2a3347}.fp-new .pdot{background:#64748b}.fp-new:hover,.fp-new.sel{background:#22293a;border-color:#8892a4}
+.fp-sold{background:#0d2006;color:#97C459;border-color:#1a3a0a}.fp-sold .pdot{background:#97C459}.fp-sold:hover,.fp-sold.sel{background:#173404;border-color:#639922}
+.fp-notinterested{background:#280a0a;color:#F09595;border-color:#3a1010}.fp-notinterested .pdot{background:#E24B4A}.fp-notinterested:hover,.fp-notinterested.sel{background:#3a1010;border-color:#A32D2D}
+.fp-callback{background:#021a33;color:#85B7EB;border-color:#0a2a4a}.fp-callback .pdot{background:#378ADD}.fp-callback:hover,.fp-callback.sel{background:#042C53;border-color:#185FA5}
+.fp-noanswer{background:#1a1204;color:#EF9F27;border-color:#2a1f08}.fp-noanswer .pdot{background:#EF9F27}.fp-noanswer:hover,.fp-noanswer.sel{background:#2a1f08;border-color:#854F0B}
+.fp-badnum{background:#1f0d04;color:#F0997B;border-color:#2d1508}.fp-badnum .pdot{background:#D85A30}.fp-badnum:hover,.fp-badnum.sel{background:#2d1508;border-color:#993C1D}
+.fp-appointment{background:#021f1a;color:#5DCAA5;border-color:#04342C}.fp-appointment .pdot{background:#1D9E75}.fp-appointment:hover,.fp-appointment.sel{background:#04342C;border-color:#0F6E56}
+.fp-pitched{background:#100e2a;color:#AFA9EC;border-color:#1a1540}.fp-pitched .pdot{background:#7F77DD}.fp-pitched:hover,.fp-pitched.sel{background:#1a1540;border-color:#534AB7}
+.fp-missedapt{background:#1a0810;color:#ED93B1;border-color:#2a0f1c}.fp-missedapt .pdot{background:#D4537E}.fp-missedapt:hover,.fp-missedapt.sel{background:#2a0f1c;border-color:#993556}
+.fp-custom{background:#111827;color:#94a3b8;border-color:#1e2535}.fp-custom .pdot{background:#94a3b8}.fp-custom:hover,.fp-custom.sel{background:#1e2535;border-color:#64748b}
+.custom-tag-flyout{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:5px 10px;font-size:12px;outline:none;width:100%;margin-top:4px}
+.custom-tag-flyout:focus{border-color:#378ADD}
+
+/* CARD COLORS */
+.card-sold{border-color:#639922!important;background:#0d1a05!important}
+.card-notinterested{border-color:#A32D2D!important;background:#1a0505!important}
+.card-callback{border-color:#185FA5!important;background:#020f1f!important}
+.card-noanswer{border-color:#854F0B!important;background:#130d02!important}
+.card-badnum{border-color:#993C1D!important;background:#150804!important}
+.card-appointment{border-color:#0F6E56!important;background:#021410!important}
+.card-pitched{border-color:#534AB7!important;background:#0b0920!important}
+.card-missedapt{border-color:#993556!important;background:#120408!important}
+.card-custom{border-color:#64748b!important;background:#111827!important}
+
+/* EXPANDED */
+.lead-expanded{margin-top:14px;border-top:1px solid rgba(255,255,255,0.06);padding-top:16px}
 .exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .info-group{display:flex;flex-direction:column;gap:8px}
 .info-row{display:flex;flex-direction:column;gap:2px}
@@ -113,8 +127,6 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
 .info-val{font-size:13px;color:#e2e8f0}
 .info-edit{font-size:13px;color:#e2e8f0;background:#1a2133;border:1px solid #378ADD;border-radius:6px;padding:3px 8px;outline:none;width:100%}
 .section-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
-.custom-tag-input{background:#1a2133;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:7px 12px;font-size:13px;outline:none;width:180px;margin-bottom:14px;display:block}
-.custom-tag-input:focus{border-color:#378ADD}
 .notes-area{background:#1a2133;border:1px solid #2a3347;border-radius:10px;color:#e2e8f0;padding:14px;font-size:14px;width:100%;resize:vertical;min-height:120px;outline:none;line-height:1.6}
 .notes-area:focus{border-color:#378ADD}
 .notes-area::placeholder{color:#475569}
@@ -208,10 +220,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <div class="modal-title">Import lead from email</div>
     <div class="modal-sub">Paste the full text of a LeadArena email — all fields pulled automatically.</div>
     <textarea class="modal-input" id="paste-email" placeholder="Paste full email text here..." style="min-height:150px;resize:vertical;font-size:13px;line-height:1.6"></textarea>
-    <div class="modal-row">
-      <button class="btn-cancel" onclick="closeImportEmail()">Cancel</button>
-      <button class="btn-primary" onclick="importFromEmail()">Import lead</button>
-    </div>
+    <div class="modal-row"><button class="btn-cancel" onclick="closeImportEmail()">Cancel</button><button class="btn-primary" onclick="importFromEmail()">Import lead</button></div>
   </div>
 </div>
 <div class="modal-bg" id="add-lead-modal">
@@ -248,47 +257,73 @@ const SUPABASE_URL='https://rgezxiouusvfutabpwkw.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnZXp4aW91dXN2ZnV0YWJwd2t3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4ODk2ODYsImV4cCI6MjA5MTQ2NTY4Nn0.zY5H878qZiTrYK4dZ3Vb3NkzfojLlyMOfYsISOa2eKI';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-const DISPS=[{key:'new',label:'New',pill:'dp-new',badge:'d-new'},{key:'sold',label:'Sold',pill:'dp-sold',badge:'d-sold'},{key:'notinterested',label:'Not interested',pill:'dp-notinterested',badge:'d-notinterested'},{key:'callback',label:'Call back',pill:'dp-callback',badge:'d-callback'},{key:'noanswer',label:'No answer',pill:'dp-noanswer',badge:'d-noanswer'},{key:'badnum',label:'Bad #',pill:'dp-badnum',badge:'d-badnum'},{key:'appointment',label:'Appointment',pill:'dp-appointment',badge:'d-appointment'},{key:'pitched',label:'Pitched',pill:'dp-pitched',badge:'d-pitched'},{key:'missedapt',label:'Missed apt',pill:'dp-missedapt',badge:'d-missedapt'},{key:'custom',label:'Custom',pill:'dp-custom',badge:'d-custom'}];
+const DISPS=[
+  {key:'new',label:'New',badge:'d-new',fp:'fp-new'},
+  {key:'sold',label:'Sold',badge:'d-sold',fp:'fp-sold'},
+  {key:'notinterested',label:'Not interested',badge:'d-notinterested',fp:'fp-notinterested'},
+  {key:'callback',label:'Call back',badge:'d-callback',fp:'fp-callback'},
+  {key:'noanswer',label:'No answer',badge:'d-noanswer',fp:'fp-noanswer'},
+  {key:'badnum',label:'Bad #',badge:'d-badnum',fp:'fp-badnum'},
+  {key:'appointment',label:'Appointment',badge:'d-appointment',fp:'fp-appointment'},
+  {key:'pitched',label:'Pitched',badge:'d-pitched',fp:'fp-pitched'},
+  {key:'missedapt',label:'Missed apt',badge:'d-missedapt',fp:'fp-missedapt'},
+  {key:'custom',label:'Custom',badge:'d-custom',fp:'fp-custom'},
+];
+const CARD_CLASS={new:'',sold:'card-sold',notinterested:'card-notinterested',callback:'card-callback',noanswer:'card-noanswer',badnum:'card-badnum',appointment:'card-appointment',pitched:'card-pitched',missedapt:'card-missedapt',custom:'card-custom'};
+const DOT_COLOR={new:'#64748b',sold:'#97C459',notinterested:'#E24B4A',callback:'#378ADD',noanswer:'#EF9F27',badnum:'#D85A30',appointment:'#1D9E75',pitched:'#7F77DD',missedapt:'#D4537E',custom:'#94a3b8'};
 
-const CARD_STYLE={new:'',sold:'border-color:#639922;background:#0d1a05',notinterested:'border-color:#A32D2D;background:#1a0505',callback:'border-color:#185FA5;background:#020f1f',noanswer:'border-color:#854F0B;background:#130d02',badnum:'border-color:#993C1D;background:#150804',appointment:'border-color:#0F6E56;background:#021410',pitched:'border-color:#534AB7;background:#0b0920',missedapt:'border-color:#993556;background:#120408',custom:'border-color:#64748b;background:#111827'};
-
-// Known field list for precise parsing
 const KNOWN_FIELDS=['First Name','Last Name','Primary Phone','Email','State','Zip','Age Range','Age','Income','Household','DOB','Date of Birth','Comments','Name','Price','Lead Id','Poverty Level','Gender','Height','Weight','Smoker','Address','City','Business Name','Secondary Phone','Alternate Phone','Other Emails','All Emails','All Phones','Current Carrier','Best Contact Time','Text Response','Lead Date','ISalesCRM Id','VSoft Id','Plan Choice','Monthly Budget','Prefered Start Date','Number Of Children','Spouse Age','employees','businessName','Business Website','Biz Verify Report','agentID'];
 
 function parseLeadEmail(raw){
   const pattern=KNOWN_FIELDS.map(f=>f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+':').join('|');
-  const get=label=>{
-    const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const m=raw.match(new RegExp(esc+':([^:]+?)(?='+pattern+'|$)','i'));
-    return m?m[1].trim():'';
-  };
+  const get=label=>{const esc=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const m=raw.match(new RegExp(esc+':([^:]+?)(?='+pattern+'|$)','i'));return m?m[1].trim():'';};
   const priceM=raw.match(/Price:\s*\$?([\d.]+)/i);
-  return{
-    id:crypto.randomUUID(),
-    firstName:get('First Name'),lastName:get('Last Name'),
-    phone:get('Primary Phone'),email:get('Email'),
-    state:get('State'),zip:get('Zip'),
-    age:get('Age'),ageRange:get('Age Range'),
-    income:get('Income'),household:get('Household'),
-    dob:get('DOB')||get('Date of Birth'),
-    comments:get('Comments'),campaign:get('Name'),
-    price:priceM?priceM[1]:get('Price'),
-    leadId:get('Lead Id'),
-    receivedAt:new Date().toISOString(),
-    disposition:'new',notes:'',customDisp:''
-  };
+  return{id:crypto.randomUUID(),firstName:get('First Name'),lastName:get('Last Name'),phone:get('Primary Phone'),email:get('Email'),state:get('State'),zip:get('Zip'),age:get('Age'),ageRange:get('Age Range'),income:get('Income'),household:get('Household'),dob:get('DOB')||get('Date of Birth'),comments:get('Comments'),campaign:get('Name'),price:priceM?priceM[1]:get('Price'),leadId:get('Lead Id'),receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};
 }
 
-let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,pollInterval=null,authMode='signin';
+let currentUser=null,leads=[],expanded=new Set(),noteTimers={},editingId=null,openFlyout=null,pollInterval=null,authMode='signin';
+
+// Close flyout when clicking outside
+document.addEventListener('click',e=>{
+  if(openFlyout&&!e.target.closest('.disp-anchor')){
+    closeFlyout();
+  }
+});
+
+function openDispFlyout(id,e){
+  e.stopPropagation();
+  if(openFlyout===id){closeFlyout();return;}
+  if(openFlyout)closeFlyout();
+  openFlyout=id;
+  const el=document.getElementById('flyout-'+id);
+  if(el)el.classList.add('open');
+}
+function closeFlyout(){
+  if(openFlyout){const el=document.getElementById('flyout-'+openFlyout);if(el)el.classList.remove('open');}
+  openFlyout=null;
+}
+async function pickDisp(id,val,e){
+  e.stopPropagation();
+  closeFlyout();
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  l.disposition=val;
+  updateStats();renderLeads();
+  await updateField(id,{disposition:val});
+}
+async function pickCustomDisp(id,val){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  l.customDisp=val;
+  await updateField(id,{custom_disp:val});
+}
 
 function switchTab(mode){authMode=mode;document.getElementById('tab-signin').classList.toggle('active',mode==='signin');document.getElementById('tab-signup').classList.toggle('active',mode==='signup');document.getElementById('signup-name-row').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign in':'Create account';document.getElementById('auth-error').classList.remove('show');}
 async function handleAuth(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const btn=document.getElementById('auth-submit-btn');if(!email||!password){showAuthError('Please enter your email and password.');return;}btn.disabled=true;btn.textContent=authMode==='signin'?'Signing in...':'Creating account...';document.getElementById('auth-error').classList.remove('show');if(authMode==='signin'){const{data,error}=await sb.auth.signInWithPassword({email,password});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Sign in';return;}await onSignedIn(data.user);}else{const name=document.getElementById('auth-name').value.trim()||email.split('@')[0];const{data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});if(error){showAuthError(error.message);btn.disabled=false;btn.textContent='Create account';return;}if(data.user&&!data.session){showAuthError('Check your email to confirm, then sign in.');btn.disabled=false;btn.textContent='Create account';return;}await onSignedIn(data.user);}}
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
 async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();}
 async function signOut(){if(pollInterval)clearInterval(pollInterval);await sb.auth.signOut();currentUser=null;leads=[];expanded.clear();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('auth-submit-btn').disabled=false;document.getElementById('auth-submit-btn').textContent='Sign in';}
-async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error('Load:',error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',customDisp:r.custom_disp||''}));renderLeads();updateStats();}
-async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error('Save:',error);showSaving(false);}
-async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error('Update:',error);}
+async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',customDisp:r.custom_disp||''}));renderLeads();updateStats();}
+async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error(error);showSaving(false);}
+async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error(error);}
 function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
 function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
 function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
@@ -305,29 +340,34 @@ function renderLeads(){
   const sel=document.getElementById('f-state');const cur=sel.value;
   sel.innerHTML='<option value="">All states</option>'+states.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');
   if(!filtered.length){list.innerHTML='<div class="empty-state">No leads yet — click Import email or + Add lead.</div>';return;}
-  const isEditing=editingId;
   list.innerHTML=filtered.map(l=>{
     const isExp=expanded.has(l.id);
     const di=dispInfo(l.disposition);
     const isToday=new Date(l.receivedAt).toDateString()===new Date().toDateString();
     const dispLabel=l.disposition==='custom'&&l.customDisp?l.customDisp:di.label;
-    const cardStyle=CARD_STYLE[l.disposition]||'';
-    const editing=isEditing===l.id;
-    return`<div class="lead-card" id="card-${l.id}" style="${cardStyle}">
+    const cardCls=CARD_CLASS[l.disposition]||'';
+    const dotColor=DOT_COLOR[l.disposition]||'#64748b';
+    const editing=editingId===l.id;
+    return`<div class="lead-card ${cardCls}" id="card-${l.id}">
       <div class="lead-top">
         <div class="lead-avatar">${initials(l.firstName+' '+l.lastName)}</div>
         <div class="lead-main">
           <div class="lead-name-row">
             ${editing
-              ? `<input class="lead-name-edit" id="edit-first-${l.id}" value="${l.firstName}" onblur="saveNameEdit('${l.id}')" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')"/> <input class="lead-name-edit" id="edit-last-${l.id}" value="${l.lastName}" onblur="saveNameEdit('${l.id}')" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')" style="width:140px"/>`
-              : `<span class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</span>`
+              ?`<input class="lead-name-edit" id="ef-${l.id}" value="${l.firstName}" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')"/> <input class="lead-name-edit" id="el-${l.id}" value="${l.lastName}" onkeydown="if(event.key==='Enter')saveNameEdit('${l.id}')" style="width:130px"/>`
+              :`<span class="lead-name">${l.firstName||'Unknown'} ${l.lastName||''}${isToday&&l.disposition==='new'?'<span class="new-tag">NEW</span>':''}</span>`
             }
           </div>
           <button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button>
           <div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}${l.household?' · '+l.household:''}</div>
-          <div class="disp-pills-inline">
-            ${DISPS.map(d=>`<div class="disp-pill ${d.pill}${l.disposition===d.key?' active':''}" onclick="setDisp('${l.id}','${d.key}')"><span class="pdot"></span>${d.label}</div>`).join('')}
-            ${l.disposition==='custom'?`<input class="custom-tag-input" placeholder="Custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" oninput="setCustomDisp('${l.id}',this.value)" style="margin-bottom:0;width:130px"/>`:''}
+          <div class="disp-anchor">
+            <span class="disp-badge ${di.badge}" onclick="openDispFlyout('${l.id}',event)">
+              <span class="dot"></span>${dispLabel} <span class="arrow">▾</span>
+            </span>
+            <div class="disp-flyout" id="flyout-${l.id}">
+              ${DISPS.map(d=>`<div class="fp ${d.fp}${l.disposition===d.key?' sel':''}" onclick="pickDisp('${l.id}','${d.key}',event)"><span class="pdot"></span>${d.label}</div>`).join('')}
+              ${l.disposition==='custom'?`<input class="custom-tag-flyout" placeholder="Custom tag..." value="${(l.customDisp||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation()" oninput="pickCustomDisp('${l.id}',this.value)"/>`:''}
+            </div>
           </div>
         </div>
         <div class="lead-right">
@@ -340,8 +380,8 @@ function renderLeads(){
       ${isExp?`<div class="lead-expanded">
         <div class="exp-grid">
           <div class="info-group">
-            <div class="info-row"><span class="info-label">Phone</span>${editing?`<input class="info-edit" id="edit-phone-${l.id}" value="${l.phone}" onblur="saveFieldEdit('${l.id}','phone',this.value)"/>`:`<span class="info-val">${formatPhone(l.phone)}</span>`}</div>
-            <div class="info-row"><span class="info-label">Email</span>${editing?`<input class="info-edit" id="edit-email-${l.id}" value="${l.email}" onblur="saveFieldEdit('${l.id}','email',this.value)"/>`:`<span class="info-val">${l.email||'—'}</span>`}</div>
+            <div class="info-row"><span class="info-label">Phone</span>${editing?`<input class="info-edit" value="${l.phone}" onblur="saveFieldEdit('${l.id}','phone',this.value)"/>`:`<span class="info-val">${formatPhone(l.phone)}</span>`}</div>
+            <div class="info-row"><span class="info-label">Email</span>${editing?`<input class="info-edit" value="${l.email}" onblur="saveFieldEdit('${l.id}','email',this.value)"/>`:`<span class="info-val">${l.email||'—'}</span>`}</div>
             <div class="info-row"><span class="info-label">Household</span>${editing?`<input class="info-edit" value="${l.household}" onblur="saveFieldEdit('${l.id}','household',this.value)"/>`:`<span class="info-val">${l.household||'—'}</span>`}</div>
             <div class="info-row"><span class="info-label">Age range</span>${editing?`<input class="info-edit" value="${l.ageRange}" onblur="saveFieldEdit('${l.id}','ageRange',this.value)"/>`:`<span class="info-val">${l.ageRange||l.age||'—'}</span>`}</div>
           </div>
@@ -367,48 +407,10 @@ function renderLeads(){
 }
 
 function toggleExpand(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);renderLeads();}
-
-function startEdit(id){
-  editingId=editingId===id?null:id;
-  if(!expanded.has(id))expanded.add(id);
-  renderLeads();
-  if(editingId){setTimeout(()=>{const el=document.getElementById('edit-first-'+id);if(el)el.focus();},50);}
-}
-
-async function saveNameEdit(id){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  const first=document.getElementById('edit-first-'+id)?.value.trim()||l.firstName;
-  const last=document.getElementById('edit-last-'+id)?.value.trim()||l.lastName;
-  l.firstName=first;l.lastName=last;
-  await updateField(id,{first_name:first,last_name:last});
-}
-
-async function saveFieldEdit(id,field,val){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  l[field]=val.trim();
-  const dbField={phone:'phone',email:'email',household:'household',ageRange:'age_range',income:'income',dob:'dob',comments:'comments'}[field]||field;
-  await updateField(id,{[dbField]:val.trim()});
-}
-
-async function saveStateZip(id,val){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  const parts=val.trim().split(/\s+/);
-  l.state=parts[0]||'';l.zip=parts[1]||'';
-  await updateField(id,{state:l.state,zip:l.zip});
-}
-
-async function setDisp(id,val){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  l.disposition=val;updateStats();renderLeads();
-  await updateField(id,{disposition:val});
-}
-
-async function setCustomDisp(id,val){
-  const l=leads.find(x=>x.id===id);if(!l)return;
-  l.customDisp=val;
-  await updateField(id,{custom_disp:val});
-}
-
+function startEdit(id){editingId=editingId===id?null:id;if(editingId&&!expanded.has(id))expanded.add(id);renderLeads();if(editingId)setTimeout(()=>{const el=document.getElementById('ef-'+id);if(el)el.focus();},50);}
+async function saveNameEdit(id){const l=leads.find(x=>x.id===id);if(!l)return;const f=document.getElementById('ef-'+id)?.value.trim()||l.firstName;const la=document.getElementById('el-'+id)?.value.trim()||l.lastName;l.firstName=f;l.lastName=la;await updateField(id,{first_name:f,last_name:la});}
+async function saveFieldEdit(id,field,val){const l=leads.find(x=>x.id===id);if(!l)return;l[field]=val.trim();const map={phone:'phone',email:'email',household:'household',ageRange:'age_range',income:'income',dob:'dob',comments:'comments'};await updateField(id,{[map[field]||field]:val.trim()});}
+async function saveStateZip(id,val){const l=leads.find(x=>x.id===id);if(!l)return;const p=val.trim().split(/\s+/);l.state=p[0]||'';l.zip=p[1]||'';await updateField(id,{state:l.state,zip:l.zip});}
 function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const ind=document.getElementById('saved-'+id);if(!ta)return;const l=leads.find(x=>x.id===id);if(!l)return;l.notes=ta.value;if(ind)ind.textContent='';clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(async()=>{await updateField(id,{notes:l.notes});if(ind){ind.textContent='Saved ✓';setTimeout(()=>{if(ind)ind.textContent='';},2000);}},800);}
 function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
 function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}
@@ -423,7 +425,7 @@ async function importFromEmail(){const raw=document.getElementById('paste-email'
 function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
 function restoreGmailPolling(){const saved=localStorage.getItem('mp_gmail');if(saved){try{const{addr,pass}=JSON.parse(saved);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}}
 function startPolling(addr,pass){if(pollInterval)clearInterval(pollInterval);document.getElementById('poll-status').textContent='Live · polling every 2 min';document.getElementById('poll-status').classList.add('live');pollGmail(addr,pass);pollInterval=setInterval(()=>pollGmail(addr,pass),120000);}
-async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();}}catch(e){console.error('Poll:',e);}}
+async function pollGmail(addr,pass){try{const res=await fetch('/api/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({addr,pass,seenIds:leads.map(l=>l.leadId).filter(Boolean)})});if(!res.ok)return;const data=await res.json();if(data.leads&&data.leads.length){for(const l of data.leads){if(!leads.find(x=>x.leadId&&x.leadId===l.leadId)){const nl={...l,id:crypto.randomUUID()};leads.unshift(nl);await saveLead(nl);}}renderLeads();updateStats();}}catch(e){console.error(e);}}
 document.getElementById('auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth();});
 document.getElementById('auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('auth-password').focus();});
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});

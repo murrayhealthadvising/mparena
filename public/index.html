@@ -268,10 +268,7 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
     <button class="tab-btn" onclick="switchTab('bucket')" id="tab-bucket">&#128293; High Priority <span class="tab-count" id="tc-bucket">0</span></button>
   </div>
   <div class="tab-pane active" id="pane-all">
-  <div class="tab-nav">
-    <button class="tab-btn active" id="tba" onclick="switchMainTab('all')">All leads <span class="tcnt" id="tca">0</span></button>
-    <button class="tab-btn" id="tbb" onclick="switchMainTab('bucket')">&#128293; High Priority <span class="tcnt" id="tcb">0</span></button>
-  </div>
+  
   <div class="tab-pane active" id="pane-all">
   <div class="filters">
     <input id="search" placeholder="Search name, phone, email..." oninput="renderLeads()"/>
@@ -297,23 +294,26 @@ body{background:#0f1117;color:#e2e8f0;min-height:100vh}
   <div class="leads-list" id="leads-list"></div>
   </div><!-- end pane-all -->
   <div class="tab-pane" id="pane-bucket">
-    <div class="bucket-header">
+    <div style="padding:14px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
       <div>
-        <div class="bucket-title">&#128293; High Priority</div>
-        <div class="bucket-sub">Last 7 days &mdash; leads to dial now</div>
+        <div style="font-size:17px;font-weight:700;color:#e2e8f0">&#128293; High Priority</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Last 7 days &mdash; leads to dial</div>
       </div>
-      <div style="font-size:12px;color:#64748b" id="bucket-count-label">0 leads</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:#64748b" id="bcl">0 leads</span>
+        <button onclick="startDialer()" style="background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer">&#9654; Start Dialer</button>
+      </div>
     </div>
-    <div class="bucket-tags" id="bucket-filters">
-      <div class="bucket-tag active" data-tag="new" style="color:#94a3b8;border-color:#2a3347;background:#1a2133" onclick="toggleBucketTag('new',this)">New</div>
-      <div class="bucket-tag active" data-tag="callback" style="color:#85B7EB;border-color:#185FA5;background:#042C53" onclick="toggleBucketTag('callback',this)">Call back</div>
-      <div class="bucket-tag active" data-tag="noanswer" style="color:#EF9F27;border-color:#854F0B;background:#2a1f08" onclick="toggleBucketTag('noanswer',this)">No answer</div>
-      <div class="bucket-tag active" data-tag="missedapt" style="color:#ED93B1;border-color:#993556;background:#2a0f1c" onclick="toggleBucketTag('missedapt',this)">Missed apt</div>
-      <div class="bucket-tag active" data-tag="pr" style="color:#5DCAA5;border-color:#0F6E56;background:#04342C" onclick="toggleBucketTag('pr',this)">PR &#10003;</div>
-      <div class="bucket-tag active" data-tag="quoted" style="color:#AFA9EC;border-color:#534AB7;background:#1a1540" onclick="toggleBucketTag('quoted',this)">Quoted</div>
-      <div class="bucket-tag active" data-tag="ghost" style="color:#F0997B;border-color:#993C1D;background:#2d1508" onclick="toggleBucketTag('ghost',this)">Ghost</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 20px 0">
+      <span class="bkt-pill" data-bk="new" style="color:#94a3b8;border-color:#2a3347;background:#1a2133" onclick="togBkt(this)">New</span>
+      <span class="bkt-pill" data-bk="callback" style="color:#85B7EB;border-color:#185FA5;background:#042C53" onclick="togBkt(this)">Call back</span>
+      <span class="bkt-pill" data-bk="noanswer" style="color:#EF9F27;border-color:#854F0B;background:#2a1f08" onclick="togBkt(this)">No answer</span>
+      <span class="bkt-pill" data-bk="missedapt" style="color:#ED93B1;border-color:#993556;background:#2a0f1c" onclick="togBkt(this)">Missed apt</span>
+      <span class="bkt-pill" data-bk="pr" style="color:#5DCAA5;border-color:#0F6E56;background:#04342C" onclick="togBkt(this)">PR &#10003;</span>
+      <span class="bkt-pill" data-bk="quoted" style="color:#AFA9EC;border-color:#534AB7;background:#1a1540" onclick="togBkt(this)">Quoted</span>
+      <span class="bkt-pill" data-bk="ghost" style="color:#F0997B;border-color:#993C1D;background:#2d1508" onclick="togBkt(this)">Ghost</span>
     </div>
-    <div class="priority-list" id="bucket-list"></div>
+    <div id="bkt-list" style="padding:12px 20px;display:flex;flex-direction:column;gap:8px"></div>
   </div>
 </div>
 <div class="modal-bg" id="import-csv-modal">

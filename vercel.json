@@ -1,11 +1,1 @@
-{
-  "version": 2,
-  "builds": [
-    { "src": "public/index.html", "use": "@vercel/static" },
-    { "src": "api/*.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/public/$1" }
-  ]
-}
+{"functions":{"api/poll.js":{"memory":512},"api/gmail-webhook.js":{"memory":512},"api/gmail-auth.js":{"memory":256},"api/gmail-callback.js":{"memory":256},"api/gmail-renew.js":{"memory":256}},"crons":[{"path":"/api/gmail-renew","schedule":"0 0 */6 * *"}],"routes":[{"src":"/api/(.*)","dest":"/api/$1"},{"src":"/(.*)","dest":"/public/$1"}]}

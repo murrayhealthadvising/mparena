@@ -1,4 +1,14 @@
-<!DOCTYPE html><!-- v3 -->
+<div class="modal-overlay" id="import-email-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">Import Lead</div>
+    <p style="font-size:13px;color:#64748b;margin:0 0 12px">Paste from USHA email or PitchPerfect — works with both formats</p>
+    <textarea id="import-paste-area" placeholder="Paste lead info here..." style="width:100%;height:160px;background:#0f1420;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:12px;font-size:13px;resize:vertical;font-family:inherit;box-sizing:border-box;outline:none"></textarea>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeImportEmail()">Cancel</button>
+      <button class="btn-primary" onclick="importFromPaste()">Import Lead</button>
+    </div>
+  </div>
+</div><!DOCTYPE html><!-- v3 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -782,7 +792,58 @@ function autoSaveNote(id){const ta=document.getElementById('notes-'+id);const in
 function resetFilters(){document.getElementById('search').value='';document.getElementById('f-state').value='';document.getElementById('f-disp').value='';document.getElementById('f-household').value='';renderLeads();}
 function updateStats(){const today=new Date().toDateString();document.getElementById('s-total').textContent=leads.length;document.getElementById('s-new').textContent=leads.filter(l=>new Date(l.receivedAt).toDateString()===today).length;document.getElementById('s-sold').textContent=leads.filter(l=>l.disposition==='sold').length;document.getElementById('s-apt').textContent=leads.filter(l=>l.disposition==='appointment').length;document.getElementById('s-cb').textContent=leads.filter(l=>l.disposition==='callback').length;document.getElementById('s-pitched').textContent=leads.filter(l=>l.disposition==='pitched').length;}
 function openImportEmail(){document.getElementById('import-email-modal').classList.add('open');}
-function closeImportEmail(){document.getElementById('import-email-modal').classList.remove('open');document.getElementById('paste-email').value='';}
+function closeImportEmail(){var m=document.getElementById('import-email-modal');if(m)m.classList.remove('open');var t=document.getElementById('import-paste-area');if(t)t.value='';var p=document.getElementById('import-parse-preview');if(p)p.style.display='none';}
+function parseLeadText(text){
+  if(!text)return null;
+  var lead={};
+  function getField(label){var re=new RegExp(label+'\s*:\s*([^\r\n]+)','i');var m=text.match(re);return m?m[1].trim():'';}
+  var ushaFirst=getField('First Name');
+  var ushaPhone=getField('Primary Phone').replace(/\D/g,'');
+  if(ushaFirst||ushaPhone){
+    lead.firstName=ushaFirst;lead.lastName=getField('Last Name');
+    lead.phone=ushaPhone;lead.email=getField('Email');
+    lead.state=getField('State');lead.zip=getField('Zip')||getField('ZIP');
+    lead.income=getField('Income');lead.household=getField('Household');
+    lead.age=getField('Age Range')||getField('Age');lead.notes=getField('Comments')||'';
+    return lead;
+  }
+  var lines=text.split(/\r?\n/).map(function(l){return l.trim();}).filter(function(l){return l&&l!=='-';});
+  var map={};
+  for(var i=0;i<lines.length-1;i++){map[lines[i].toLowerCase()]=lines[i+1];}
+  lead.firstName=map['first name']||'';
+  lead.lastName=map['last name']||'';
+  lead.phone=(map['phone number']||map['phone']||'').replace(/\D/g,'');
+  lead.email=map['email']||map['email address']||'';
+  lead.state=map['state']||'';
+  lead.zip=map['zip code']||map['zip']||'';
+  lead.income=map['income']||'';
+  lead.household=map['hh size']||map['household size']||map['household']||'';
+  lead.age=map['age']||'';
+  lead.notes=map['tags']||'';
+  if(!lead.firstName&&!lead.phone)return null;
+  return lead;
+}
+function importFromPaste(){
+  var text=document.getElementById('import-paste-area').value.trim();
+  if(!text){alert('Paste lead info first');return;}
+  var lead=parseLeadText(text);
+  if(!lead){alert('Could not find name or phone. Make sure you paste the full lead info.');return;}
+  lead.source='paste';lead.disposition='new';lead.receivedAt=new Date().toISOString();
+  var btn=document.querySelector('[onclick="importFromPaste()"]');
+  if(btn){btn.textContent='Importing...';btn.disabled=true;}
+  sb.auth.getSession().then(function(r){
+    var uid=r.data&&r.data.session?r.data.session.user.id:null;
+    if(!uid){alert('Not logged in');return;}
+    lead.user_id=uid;
+    sb.from('leads').insert(lead).then(function(res){
+      if(btn){btn.textContent='Import Lead';btn.disabled=false;}
+      if(res.error){alert('Error: '+res.error.message);return;}
+      closeImportEmail();
+      showToast('Lead imported!');
+      if(typeof renderLeads==='function')renderLeads();
+    });
+  });
+}
 function openAddLead(){document.getElementById('add-lead-modal').classList.add('open');}
 function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 function openSetup(){document.getElementById('setup-modal').classList.add('open');}
@@ -1157,7 +1218,7 @@ function syncGmail(){
       .then(function(d){
         if(btn){btn.textContent='\u21BA Sync Now';btn.disabled=false;}
         showToast(d.imported > 0 ? 'Imported '+d.imported+' leads!' : (d.message||d.error||'No new leads found'), 3500);
-        if(d.imported > 0 && typeof loadLeads==='function') loadLeads();
+        if(d.imported > 0){if(typeof loadLeads==='function')loadLeads();else if(typeof renderLeads==='function')renderLeads();}
       }).catch(function(){if(btn){btn.textContent='\u21BA Sync Now';btn.disabled=false;}});
   });
 }

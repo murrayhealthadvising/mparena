@@ -349,21 +349,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div class="filter-label">Date to</div>
           <input class="filter-input" id="f-date-to" type="date">
         </div>
-        <div class="filter-group" style="flex:1;max-width:160px">
-          <div class="filter-label">State</div>
-          <select class="filter-select" id="f-state">
-            <option value="">All states</option>
-            <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option>
-            <option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option>
-            <option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option>
-            <option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option>
-            <option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option>
-            <option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option>
-            <option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option>
-            <option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option>
-            <option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option>
-            <option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
-          </select>
+        <div class="filter-group" style="flex:2;min-width:200px">
+          <div class="filter-label">States</div>
+          <div style="position:relative">
+            <div id="state-tags" onclick="document.getElementById('state-input').focus()" style="display:flex;flex-wrap:wrap;gap:4px;min-height:36px;background:#1a2133;border:1px solid #2a3347;border-radius:8px;padding:3px 8px;align-items:center;cursor:text">
+              <input id="state-input" placeholder="Type state..." autocomplete="off" style="border:none;background:transparent;color:#e2e8f0;outline:none;font-size:13px;min-width:80px" oninput="showStateDropdown(this.value)" onkeydown="stateInputKey(event)">
+            </div>
+            <div id="state-dropdown" style="display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:#151821;border:1px solid #2a3347;border-radius:8px;z-index:300;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.4)"></div>
+          </div>
         </div>
         <div class="filter-group" style="flex:1;max-width:180px">
           <div class="filter-label">Disposition</div>
@@ -380,15 +373,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <option value="badnum">Bad number</option>
           </select>
         </div>
-        <div class="filter-group" style="flex:1;max-width:160px">
-          <div class="filter-label">Household</div>
-          <select class="filter-select" id="f-household">
-            <option value="">Any size</option>
-            <option value="1">1 person</option>
-            <option value="2">2 people</option>
-            <option value="3">3 people</option>
-            <option value="4">4 people</option>
-            <option value="5+">5+ people</option>
+        <div class="filter-group" style="flex:1;max-width:180px">
+          <div class="filter-label">Time Zone</div>
+          <select class="filter-select" id="f-timezone">
+            <option value="">All time zones</option>
+            <option value="ET">Eastern (ET)</option>
+            <option value="CT">Central (CT)</option>
+            <option value="MT">Mountain (MT)</option>
+            <option value="PT">Pacific (PT)</option>
+            <option value="AKT">Alaska (AKT)</option>
+            <option value="HT">Hawaii (HT)</option>
           </select>
         </div>
       </div>
@@ -721,7 +715,7 @@ function renderLeads(){
             }
           </div>
           <button class="lead-phone" onclick="copyPhone('${l.phone}')">${formatPhone(l.phone)} <span class="copy-hint">copy</span></button>
-          <div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}${l.household?' · '+l.household:''}</div>
+          <div class="lead-meta">${l.email||''}${l.state?' · '+l.state:''}${l.zip?" · "+l.zip:""}${localTime(l.state)?" · 🕒 "+localTime(l.state):""}</div>
           <div class="disp-anchor">
             <span class="disp-badge ${di.badge}" onclick="openDispFlyout('${l.id}',event)">
               <span class="dot"></span>${dispLabel} <span class="arrow">▾</span>
@@ -985,12 +979,101 @@ function switchMainTab(n){var a=document.getElementById('tba'),b=document.getEle
 function startDialer(){if(typeof bktLeads!=='function'){alert('Page still loading, try again.');return;}var q=bktLeads();if(!q.length){alert('No leads in High Priority queue.');return;}dialerQueue=q;dialerIdx=0;dialerActive=true;document.getElementById('dialer-bar').classList.add('active');if(typeof dialerShow==='function')dialerShow();}
 var dialerQueue=[];var dialerIdx=0;var dialerActive=false;
 
+sb.auth.onAuthStateChange(function(_e,ses){if(ses)onSignedIn(ses.user).catch(function(){});});
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
 </script>
 
 
 <script src="/bucket.js"></script>
 <script>
+// ── STATE / TIMEZONE MAPS ─────────────────────────────────────────────
+var STATE_TZ = {
+  CT:'ET',ME:'ET',MA:'ET',NH:'ET',NJ:'ET',NY:'ET',PA:'ET',RI:'ET',VT:'ET',
+  DE:'ET',FL:'ET',GA:'ET',MD:'ET',NC:'ET',SC:'ET',VA:'ET',WV:'ET',DC:'ET',
+  AL:'CT',AR:'CT',IL:'CT',IA:'CT',KS:'CT',KY:'CT',LA:'CT',MN:'CT',MS:'CT',
+  MO:'CT',NE:'CT',ND:'CT',OK:'CT',SD:'CT',TN:'CT',TX:'CT',WI:'CT',IN:'CT',
+  AZ:'MT',CO:'MT',ID:'MT',MT:'MT',NM:'MT',UT:'MT',WY:'MT',NV:'MT',
+  CA:'PT',OR:'PT',WA:'PT',
+  AK:'AKT',HI:'HT'
+};
+var TZ_OFFSET = {ET:-5,CT:-6,MT:-7,PT:-8,AKT:-9,HT:-10};
+function localTime(state) {
+  if(!state) return '';
+  var tz = STATE_TZ[state.toUpperCase()];
+  if(!tz) return '';
+  var now = new Date();
+  var utc = now.getTime() + now.getTimezoneOffset()*60000;
+  var local = new Date(utc + TZ_OFFSET[tz]*3600000);
+  var h = local.getHours(), m = local.getMinutes();
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + (m<10?'0':'')+m + ' ' + ampm + ' ' + tz;
+}
+
+// ── MULTI-STATE FILTER ────────────────────────────────────────────────
+var selectedStates = [];
+var ALL_STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+
+function showStateDropdown(val) {
+  var dd = document.getElementById('state-dropdown');
+  if(!dd) return;
+  val = (val||'').toUpperCase().trim();
+  var matches = ALL_STATES.filter(function(s){
+    return (!val || s.startsWith(val)) && selectedStates.indexOf(s) === -1;
+  });
+  if(!matches.length){dd.style.display='none';return;}
+  dd.innerHTML = matches.slice(0,12).map(function(s){
+    return '<div onclick="addStateTag(\''+s+'\')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e2e8f0" onmouseover="this.style.background=\'#1a2d4a\'" onmouseout="this.style.background=\'\'">'+s+'</div>';
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function addStateTag(state) {
+  if(selectedStates.indexOf(state) !== -1) return;
+  selectedStates.push(state);
+  renderStateTags();
+  var inp = document.getElementById('state-input');
+  if(inp){inp.value='';inp.focus();}
+  var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
+  if(typeof renderLeads==='function') renderLeads();
+}
+
+function removeStateTag(state) {
+  selectedStates = selectedStates.filter(function(s){return s!==state;});
+  renderStateTags();
+  if(typeof renderLeads==='function') renderLeads();
+}
+
+function renderStateTags() {
+  var container = document.getElementById('state-tags');
+  if(!container) return;
+  var tags = selectedStates.map(function(s){
+    return '<span style="background:#1a3d6b;color:#85B7EB;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px">'+s+'<button onclick="removeStateTag(\''+s+'\')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;line-height:1;padding:0">&times;</button></span>';
+  }).join('');
+  container.innerHTML = tags + '<input id="state-input" placeholder="'+(selectedStates.length?'':'Type state...')+'" autocomplete="off" style="border:none;background:transparent;color:#e2e8f0;outline:none;font-size:13px;min-width:60px" oninput="showStateDropdown(this.value)" onkeydown="stateInputKey(event)">';
+}
+
+function stateInputKey(e) {
+  if(e.key==='Enter'||e.key===',') {
+    e.preventDefault();
+    var val = (e.target.value||'').trim().toUpperCase();
+    if(ALL_STATES.indexOf(val)!==-1) addStateTag(val);
+  }
+  if(e.key==='Escape') {
+    var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
+  }
+  if(e.key==='Backspace' && !e.target.value && selectedStates.length) {
+    removeStateTag(selectedStates[selectedStates.length-1]);
+  }
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.closest || (!e.target.closest('#state-tags')&&!e.target.closest('#state-dropdown'))){
+    var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
+  }
+});
+
+// ── CUSTOM TAGS ───────────────────────────────────────────────────────
 var customDispTags=JSON.parse(localStorage.getItem('mpa_custom_disp')||'[]');
 var customBktTags=JSON.parse(localStorage.getItem('mpa_custom_bkt')||'[]');
 function saveCustomTags(){localStorage.setItem('mpa_custom_disp',JSON.stringify(customDispTags));localStorage.setItem('mpa_custom_bkt',JSON.stringify(customBktTags));}
@@ -998,81 +1081,117 @@ function addCustomDispTag(){var inp=document.getElementById('custom-disp-input')
 function removeCustomDispTag(tag){customDispTags=customDispTags.filter(function(t){return t!==tag;});saveCustomTags();renderCustomTags();}
 function addCustomBktTag(){var inp=document.getElementById('custom-bkt-input');var val=(inp.value||'').trim().toLowerCase();if(!val||customBktTags.indexOf(val)!==-1)return;customBktTags.push(val);saveCustomTags();inp.value='';renderCustomTags();}
 function removeCustomBktTag(tag){customBktTags=customBktTags.filter(function(t){return t!==tag;});saveCustomTags();renderCustomTags();}
-function renderCustomTags(){var dl=document.getElementById('custom-disp-tags');var bl=document.getElementById('custom-bkt-tags');if(dl)dl.innerHTML=customDispTags.map(function(t){return '<span class="tag-item">'+t+'<button class="tag-remove" onclick="removeCustomDispTag(\''+t+'\')">&times;</button></span>';}).join('');if(bl)bl.innerHTML=customBktTags.map(function(t){return '<span class="tag-item">'+t+'<button class="tag-remove" onclick="removeCustomBktTag(\''+t+'\')">&times;</button></span>';}).join('');}
+function renderCustomTags(){
+  var dl=document.getElementById('custom-disp-tags');
+  var bl=document.getElementById('custom-bkt-tags');
+  if(dl)dl.innerHTML=customDispTags.map(function(t){return '<span class="tag-item">'+t+'<button class="tag-remove" onclick="removeCustomDispTag(\''+t+'\')">&#215;</button></span>';}).join('');
+  if(bl)bl.innerHTML=customBktTags.map(function(t){return '<span class="tag-item">'+t+'<button class="tag-remove" onclick="removeCustomBktTag(\''+t+'\')">&#215;</button></span>';}).join('');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────
 var currentPage='dashboard';
 function navTo(page){
   currentPage=page;
   ['dashboard','leads','bucket','settings'].forEach(function(p){var el=document.getElementById('nav-'+p);if(el)el.classList.toggle('active',p===page);});
   ['dashboard','leads','bucket','settings'].forEach(function(p){var el=document.getElementById('page-'+p);if(el)el.classList.toggle('active',p===page);});
-  var tp=document.getElementById('topbar-page');if(tp)tp.textContent={dashboard:'Dashboard',leads:'All Leads',bucket:'High Priority',settings:'Settings'}[page]||page;
+  var tp=document.getElementById('topbar-page');
+  if(tp)tp.textContent={dashboard:'Dashboard',leads:'All Leads',bucket:'High Priority',settings:'Settings'}[page]||page;
   var ta=document.getElementById('topbar-actions');
-  if(ta){if(page==='leads')ta.innerHTML='<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()">+ Add Lead</button> <button class="topbar-btn" onclick="openImportEmail()">&#128139; Import Email</button> <button class="topbar-btn" onclick="openImportCsv()">&#128196; Import CSV</button>';else ta.innerHTML='';}
+  if(ta){
+    if(page==='leads')ta.innerHTML='<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()">+ Add Lead</button> <button class="topbar-btn" onclick="openImportEmail()">&#128139; Import Email</button> <button class="topbar-btn" onclick="openImportCsv()">&#128196; Import CSV</button>';
+    else ta.innerHTML='';
+  }
   if(page==='bucket'&&typeof renderBkt==='function')renderBkt();
   if(page==='dashboard')renderDashboard();
   if(page==='settings')renderCustomTags();
   closeSidebar();
 }
-function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');}
+function openSidebar(){var s=document.getElementById('sidebar');var o=document.getElementById('sidebar-overlay');if(s)s.classList.add('open');if(o)o.classList.add('open');}
 function closeSidebar(){var s=document.getElementById('sidebar');var o=document.getElementById('sidebar-overlay');if(s)s.classList.remove('open');if(o)o.classList.remove('open');}
 var authMode='login';
 function switchAuthTab(mode,btn){authMode=mode;document.querySelectorAll('.auth-tab').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');document.getElementById('auth-submit-btn').textContent=mode==='login'?'Sign in':'Create account';document.getElementById('auth-err').textContent='';}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────
 function renderDashboard(){
-  var h=new Date().getHours();var greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-  var em=document.getElementById('sidebar-email');var name=em?em.textContent.split('@')[0]:'';
-  var gEl=document.getElementById('dash-greeting');if(gEl)gEl.textContent=greet+(name?', '+name:'')+' \uD83D\uDC4B';
-  var dEl=document.getElementById('dash-date');if(dEl)dEl.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var hr=new Date().getHours();
+  var greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  var em=document.getElementById('sidebar-email');
+  var name=em?em.textContent.split('@')[0]:'';
+  var gEl=document.getElementById('dash-greeting');
+  if(gEl)gEl.textContent=greet+(name?', '+name:'')+' \uD83D\uDC4B';
+  var dEl=document.getElementById('dash-date');
+  if(dEl)dEl.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   if(typeof leads==='undefined'||!leads.length)return;
-  var today=new Date();today.setHours(0,0,0,0);var weekAgo=new Date(Date.now()-7*24*60*60*1000);
+  var today=new Date();today.setHours(0,0,0,0);
+  var weekAgo=new Date(Date.now()-7*24*60*60*1000);
   var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-  set('ds-total',leads.length);set('ds-today',leads.filter(function(l){return new Date(l.receivedAt)>=today;}).length);
+  set('ds-total',leads.length);
+  set('ds-today',leads.filter(function(l){return new Date(l.receivedAt)>=today;}).length);
   set('ds-week',leads.filter(function(l){return new Date(l.receivedAt)>=weekAgo;}).length);
   set('ds-sold',leads.filter(function(l){return l.disposition==='sold';}).length);
   set('ds-apt',leads.filter(function(l){return l.disposition==='appointment';}).length);
   set('ds-cb',leads.filter(function(l){return l.disposition==='callback';}).length);
   var recent=leads.slice().sort(function(a,b){return new Date(b.receivedAt)-new Date(a.receivedAt);}).slice(0,5);
   var rl=document.getElementById('dash-recent-leads');
-  if(rl)rl.innerHTML=recent.map(function(l){return '<div class="recent-row"><div><div class="recent-name">'+(l.firstName||'')+' '+(l.lastName||'')+'</div><div class="recent-meta">'+(l.state||'')+(l.income?' \u00b7 '+l.income:'')+'</div></div><div style="font-size:11px;color:#64748b">'+fmtDate(l.receivedAt)+'</div></div>';}).join('');
-  var dispCounts={};leads.forEach(function(l){var d=l.disposition||'new';dispCounts[d]=(dispCounts[d]||0)+1;});
+  if(rl)rl.innerHTML=recent.map(function(l){
+    return '<div class="recent-row"><div><div class="recent-name">'+(l.firstName||'')+' '+(l.lastName||'')+'</div><div class="recent-meta">'+(l.state||'')+(l.income?' \u00b7 '+l.income:'')+'</div></div><div style="font-size:11px;color:#64748b">'+fmtDate(l.receivedAt)+'</div></div>';
+  }).join('');
+  var dispCounts={};
+  leads.forEach(function(l){var d=l.disposition||'new';dispCounts[d]=(dispCounts[d]||0)+1;});
   var db=document.getElementById('dash-disp-breakdown');
-  if(db)db.innerHTML=['new','callback','noanswer','sold','appointment','pitched','notinterested','missedapt','badnum'].filter(function(d){return dispCounts[d];}).map(function(d){var info=dispInfo(d);return '<div class="recent-row"><div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:'+info.color+';display:inline-block"></span><div class="recent-name">'+info.label+'</div></div><div style="font-size:13px;font-weight:600;color:#e2e8f0">'+dispCounts[d]+'</div></div>';}).join('');
+  if(db)db.innerHTML=['new','callback','noanswer','sold','appointment','pitched','notinterested','missedapt','badnum'].filter(function(d){return dispCounts[d];}).map(function(d){
+    var info=dispInfo(d);
+    return '<div class="recent-row"><div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:'+info.color+';display:inline-block"></span><div class="recent-name">'+info.label+'</div></div><div style="font-size:13px;font-weight:600;color:#e2e8f0">'+dispCounts[d]+'</div></div>';
+  }).join('');
 }
+
+// ── FILTER / STATS ────────────────────────────────────────────────────
 function applyFilters(){renderLeads();}
+function resetFilters(){
+  selectedStates=[];renderStateTags();
+  ['f-search','f-disp','f-timezone','f-date-from','f-date-to'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  renderLeads();
+}
 function updTC(){
   if(typeof leads==='undefined')return;
   var nlc=document.getElementById('nav-leads-cnt');if(nlc)nlc.textContent=leads.length;
   var lcl=document.getElementById('leads-count-label');if(lcl)lcl.textContent=(typeof getFiltered==='function'?getFiltered().length:leads.length)+' leads';
-  if(typeof bktLeads==='function'){var bl=bktLeads();var nbc=document.getElementById('nav-bucket-cnt');if(nbc)nbc.textContent=bl.length;var bcl=document.getElementById('bcl');if(bcl)bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');}
+  if(typeof bktLeads==='function'){
+    var bl=bktLeads();
+    var nbc=document.getElementById('nav-bucket-cnt');if(nbc)nbc.textContent=bl.length;
+    var bcl=document.getElementById('bcl');if(bcl)bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');
+  }
   renderDashboard();
 }
 function switchTab(){}
 function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
+
+// ── PATCH onSignedIn, handleAuth, updateStats, getFiltered ───────────
 (function(){
-  var _orig=onSignedIn;
-  onSignedIn=async function(user){
+  var _origOnSI = onSignedIn;
+  onSignedIn = async function(user){
     var av=document.getElementById('sidebar-avatar');if(av)av.textContent=(user.email||'?')[0].toUpperCase();
     var em=document.getElementById('sidebar-email');if(em)em.textContent=user.email||'';
     var as=document.getElementById('auth-screen');if(as)as.style.display='none';
-    await _orig(user);
+    await _origOnSI(user);
     navTo('dashboard');
   };
-  var _origHA=handleAuth;
-  handleAuth=async function(){
-    var isLogin=authMode!=='signup';
-    var email=document.getElementById('auth-email').value.trim();
-    var pass=document.getElementById('auth-pass').value;
-    var errEl=document.getElementById('auth-err');
+  handleAuth = async function(){
+    var isLogin = authMode!=='signup';
+    var email = document.getElementById('auth-email').value.trim();
+    var pass = document.getElementById('auth-pass').value;
+    var errEl = document.getElementById('auth-err');
     if(!email||!pass){if(errEl)errEl.textContent='Please enter email and password.';return;}
     var btn=document.getElementById('auth-submit-btn');if(btn)btn.textContent='...';
-    var res=isLogin?await sb.auth.signInWithPassword({email,password:pass}):await sb.auth.signUp({email,password:pass});
+    var res = isLogin ? await sb.auth.signInWithPassword({email:email,password:pass}) : await sb.auth.signUp({email:email,password:pass});
     if(btn)btn.textContent=isLogin?'Sign in':'Create account';
     if(res.error){if(errEl)errEl.textContent=res.error.message;return;}
-    if(!isLogin){if(errEl)errEl.textContent='Account created! Check your email.';return;}
-    if(res.data.user)await onSignedIn(res.data.user);
+    if(!isLogin){if(errEl)errEl.textContent='Account created! Check your email to confirm.';return;}
+    if(res.data.user) await onSignedIn(res.data.user);
   };
-  // Also patch updateStats to update new elements
-  var _origUS=updateStats;
-  updateStats=function(){
-    _origUS&&_origUS();
+  var _origUS = typeof updateStats==='function'?updateStats:null;
+  updateStats = function(){
+    if(_origUS) _origUS();
     if(typeof leads==='undefined')return;
     var today=new Date();today.setHours(0,0,0,0);
     var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
@@ -1084,26 +1203,25 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
     set('sb-pitched',leads.filter(function(l){return l.disposition==='pitched';}).length);
     var lcl=document.getElementById('leads-count-label');if(lcl)lcl.textContent=(typeof getFiltered==='function'?getFiltered().length:leads.length)+' leads';
   };
-  // patch getFiltered to support date filters
-  getFiltered=function(){
+  getFiltered = function(){
     var q=(document.getElementById('f-search')||{}).value||'';
-    var st=(document.getElementById('f-state')||{}).value||'';
     var dp=(document.getElementById('f-disp')||{}).value||'';
-    var hh=(document.getElementById('f-household')||{}).value||'';
+    var tz=(document.getElementById('f-timezone')||{}).value||'';
     var df=(document.getElementById('f-date-from')||{}).value||'';
     var dt=(document.getElementById('f-date-to')||{}).value||'';
     q=q.toLowerCase();
     return leads.filter(function(l){
-      if(q&&!((l.firstName||'').toLowerCase().includes(q)||(l.lastName||'').toLowerCase().includes(q)||(l.phone||'').includes(q)||(l.email||'').toLowerCase().includes(q)))return false;
-      if(st&&l.state!==st)return false;
+      if(q&&!((l.firstName||'').toLowerCase().includes(q)||(l.lastName||'').toLowerCase().includes(q)||(l.phone||'').includes(q)||(l.email||'').toLowerCase().includes(q)||(l.zip||'').includes(q)))return false;
+      if(selectedStates.length && selectedStates.indexOf(l.state)===-1) return false;
       if(dp&&(l.disposition||'new')!==dp)return false;
-      if(hh&&l.household!==hh)return false;
+      if(tz&&STATE_TZ[(l.state||'').toUpperCase()]!==tz)return false;
       if(df&&new Date(l.receivedAt)<new Date(df))return false;
       if(dt&&new Date(l.receivedAt)>new Date(dt+'T23:59:59'))return false;
       return true;
     });
   };
 })();
+
 </script>
 </body>
 </html>

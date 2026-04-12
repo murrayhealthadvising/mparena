@@ -1,31 +1,70 @@
-const{google}=require('googleapis');
-const{createClient}=require('@supabase/supabase-js');
-const REDIRECT_URI='https://mparena.vercel.app/api/gmail-callback';
-module.exports=async(req,res)=>{
-  const{code,state:userId,error}=req.query;
-  const errPage=msg=>res.status(400).send('<html><body style="font-family:sans-serif;background:#0f1117;color:#e2e8f0;padding:40px;text-align:center"><h2 style="color:#F09595">Connection failed</h2><p>'+msg+'</p><a href="https://mparena.vercel.app" style="color:#378ADD">&larr; Back to MParena</a></body></html>');
-  if(error)return errPage('Google error: '+error);
-  if(!code)return errPage('No authorization code received');
-  try{
-    const oauth2Client=new google.auth.OAuth2(process.env.GOOGLE_OAUTH_CLIENT_ID,process.env.GOOGLE_OAUTH_CLIENT_SECRET,REDIRECT_URI);
-    const{tokens}=await oauth2Client.getToken(code);
-    console.log('Tokens - access:',!!tokens.access_token,'refresh:',!!tokens.refresh_token);
-    if(!tokens.access_token)return errPage('No access token from Google');
-    const uRes=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+tokens.access_token}});
-    const uInfo=await uRes.json();
-    const gmailAddress=uInfo.email;
-    console.log('Gmail:',gmailAddress);
-    if(!gmailAddress)return errPage('Could not get Gmail address: '+JSON.stringify(uInfo));
-    const sb=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY);
-    const{error:dbErr}=await sb.from('gmail_accounts').upsert({user_id:userId,gmail_address:gmailAddress,access_token:tokens.access_token,refresh_token:tokens.refresh_token||null,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-    if(dbErr){console.error('DB:',dbErr);return errPage('Database error: '+dbErr.message);}
-    const wRes=await fetch('https://www.googleapis.com/gmail/v1/users/me/watch',{method:'POST',headers:{Authorization:'Bearer '+tokens.access_token,'Content-Type':'application/json'},body:JSON.stringify({topicName:process.env.PUBSUB_TOPIC,labelIds:['INBOX'],labelFilterBehavior:'include'})});
-    const wData=await wRes.json();
-    console.log('Watch:',JSON.stringify(wData));
-    if(wData.error)console.error('Watch error (non-fatal):',wData.error.message);
-    return res.status(200).send('<html><body style="font-family:sans-serif;background:#0f1117;color:#e2e8f0;padding:40px;text-align:center;max-width:480px;margin:0 auto"><div style="font-size:56px;margin-bottom:16px">&#10003;</div><h2 style="color:#97C459;margin-bottom:8px">Gmail connected!</h2><p style="color:#94a3b8;margin-bottom:6px">'+gmailAddress+'</p><p style="color:#64748b;font-size:13px;margin-bottom:28px">New Lead emails from LeadArena will appear in MParena automatically.</p><a href="https://mparena.vercel.app" style="background:#378ADD;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600">Open MParena &rarr;</a></body></html>');
-  }catch(err){
-    console.error('Callback fatal:',err.message);
-    return res.status(500).send('<html><body style="font-family:sans-serif;background:#0f1117;color:#e2e8f0;padding:40px;text-align:center"><h2 style="color:#F09595">Error</h2><p>'+err.message+'</p><a href="https://mparena.vercel.app" style="color:#378ADD">&larr; Back</a></body></html>');
+const { createClient } = require('@supabase/supabase-js');
+
+module.exports = async (req, res) => {
+  const { code, state, error } = req.query;
+  const APP_URL = 'https://mparena.vercel.app';
+
+  if (error) {
+    return res.redirect(APP_URL + '?gmail_error=' + encodeURIComponent(error));
+  }
+  if (!code) {
+    return res.redirect(APP_URL + '?gmail_error=no_code');
+  }
+
+  try {
+    // Exchange code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+        client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+        redirect_uri: process.env.VERCEL_URL
+          ? 'https://' + process.env.VERCEL_URL + '/api/gmail-callback'
+          : APP_URL + '/api/gmail-callback',
+        grant_type: 'authorization_code'
+      })
+    });
+    const tokens = await tokenRes.json();
+    if (!tokens.access_token) {
+      return res.redirect(APP_URL + '?gmail_error=token_exchange_failed');
+    }
+
+    // Get gmail address
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: 'Bearer ' + tokens.access_token }
+    });
+    const profile = await profileRes.json();
+    const gmailEmail = profile.email || '';
+
+    // Decode state to get user_id
+    let userId = null;
+    try { userId = Buffer.from(state || '', 'base64').toString('utf8'); } catch(e){}
+
+    // Save to Supabase
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    await sb.from('gmail_accounts').upsert({
+      user_id: userId,
+      email: gmailEmail,
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token || null,
+      expires_at: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000).toISOString() : null,
+      connected: true,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+
+    // Trigger background import of last 7 days (fire and forget)
+    if (userId) {
+      const importUrl = APP_URL + '/api/poll?user_id=' + encodeURIComponent(userId) + '&days=7&trigger=connect';
+      fetch(importUrl).catch(() => {});
+    }
+
+    // Redirect back to app with success flag
+    return res.redirect(APP_URL + '?gmail_connected=1');
+
+  } catch (err) {
+    console.error('Gmail callback error:', err.message);
+    return res.redirect(APP_URL + '?gmail_error=' + encodeURIComponent(err.message));
   }
 };

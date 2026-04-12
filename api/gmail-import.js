@@ -7,15 +7,20 @@ function parseUshaEmail(body) {
     return m ? m[1].trim() : '';
   };
   return {
-    firstName:   get('First Name'),
-    lastName:    get('Last Name'),
+    first_name:  get('First Name'),
+    last_name:   get('Last Name'),
     phone:       get('Primary Phone').replace(/\D/g, ''),
     email:       get('Email'),
     state:       get('State'),
-    age:         get('Age Range') || get('Age'),
+    zip:         get('Zip') || get('ZIP'),
+    age:         get('Age'),
+    age_range:   get('Age Range'),
     income:      get('Income'),
     household:   get('Household'),
     notes:       get('Comments') || '',
+    campaign:    get('Name'),
+    price:       parseFloat(get('Price')) || null,
+    lead_id_ext: get('Lead Id'),
     source:      'gmail',
     disposition: 'new',
   };
@@ -68,10 +73,11 @@ module.exports = async (req, res) => {
     );
     const searchData = await searchRes.json();
     if (searchData.error) return res.status(200).json({ imported: 0, error: searchData.error.message });
-    if (!searchData.messages?.length) return res.status(200).json({ imported: 0, checked: 0, message: 'No USHA emails in last ' + days + ' days' });
+    if (!searchData.messages?.length) return res.status(200).json({ imported: 0, checked: 0, message: 'No USHA emails found in last ' + days + ' days' });
 
     let imported = 0, skipped = 0;
     const errors = [];
+
     for (const msg of searchData.messages) {
       try {
         const msgRes = await fetch(
@@ -92,14 +98,22 @@ module.exports = async (req, res) => {
         }
         if (!body) continue;
         const lead = parseUshaEmail(body);
-        if (!lead.firstName && !lead.phone) continue;
+        if (!lead.first_name && !lead.phone) continue;
+
         const dateHeader = (payload?.headers || []).find(h => h.name === 'Date');
-        lead.receivedAt = dateHeader ? new Date(dateHeader.value).toISOString() : new Date().toISOString();
+        lead.received_at = dateHeader ? new Date(dateHeader.value).toISOString() : new Date().toISOString();
         lead.user_id = user_id;
+        lead.email_message_id = msg.id;
+
+        // Skip duplicate by message ID
+        const { data: dup1 } = await sb.from('leads').select('id').eq('email_message_id', msg.id).eq('user_id', user_id).maybeSingle();
+        if (dup1) { skipped++; continue; }
+        // Skip duplicate by phone
         if (lead.phone) {
-          const { data: dup } = await sb.from('leads').select('id').eq('phone', lead.phone).eq('user_id', user_id).maybeSingle();
-          if (dup) { skipped++; continue; }
+          const { data: dup2 } = await sb.from('leads').select('id').eq('phone', lead.phone).eq('user_id', user_id).maybeSingle();
+          if (dup2) { skipped++; continue; }
         }
+
         const { error: insertErr } = await sb.from('leads').insert(lead);
         if (!insertErr) imported++;
         else errors.push(insertErr.message);

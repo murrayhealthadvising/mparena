@@ -979,6 +979,7 @@ function switchMainTab(n){var a=document.getElementById('tba'),b=document.getEle
 function startDialer(){if(typeof bktLeads!=='function'){alert('Page still loading, try again.');return;}var q=bktLeads();if(!q.length){alert('No leads in High Priority queue.');return;}dialerQueue=q;dialerIdx=0;dialerActive=true;document.getElementById('dialer-bar').classList.add('active');if(typeof dialerShow==='function')dialerShow();}
 var dialerQueue=[];var dialerIdx=0;var dialerActive=false;
 
+(function(){var p=new URLSearchParams(window.location.search);if(p.get('gmail_connected')){window._gmailJustConnected=true;history.replaceState({},'','/');}if(p.get('gmail_error')){window._gmailError=p.get('gmail_error');history.replaceState({},'','/');}})();
 sb.auth.getSession().then(({data:{session}})=>{if(session)onSignedIn(session.user);});
 </script>
 
@@ -992,8 +993,7 @@ var STATE_TZ = {
   AL:'CT',AR:'CT',IL:'CT',IA:'CT',KS:'CT',KY:'CT',LA:'CT',MN:'CT',MS:'CT',
   MO:'CT',NE:'CT',ND:'CT',OK:'CT',SD:'CT',TN:'CT',TX:'CT',WI:'CT',IN:'CT',
   AZ:'MT',CO:'MT',ID:'MT',MT:'MT',NM:'MT',UT:'MT',WY:'MT',NV:'MT',
-  CA:'PT',OR:'PT',WA:'PT',
-  AK:'AKT',HI:'HT'
+  CA:'PT',OR:'PT',WA:'PT',AK:'AKT',HI:'HT'
 };
 var TZ_OFFSET = {ET:-5,CT:-6,MT:-7,PT:-8,AKT:-9,HT:-10};
 function localTime(state) {
@@ -1012,64 +1012,42 @@ function localTime(state) {
 // ── MULTI-STATE FILTER ────────────────────────────────────────────────
 var selectedStates = [];
 var ALL_STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
-
 function showStateDropdown(val) {
   var dd = document.getElementById('state-dropdown');
   if(!dd) return;
   val = (val||'').toUpperCase().trim();
-  var matches = ALL_STATES.filter(function(s){
-    return (!val || s.startsWith(val)) && selectedStates.indexOf(s) === -1;
-  });
+  var matches = ALL_STATES.filter(function(s){return (!val||s.startsWith(val))&&selectedStates.indexOf(s)===-1;});
   if(!matches.length){dd.style.display='none';return;}
-  dd.innerHTML = matches.slice(0,12).map(function(s){
-    return '<div onclick="addStateTag(\''+s+'\')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e2e8f0" onmouseover="this.style.background=\'#1a2d4a\'" onmouseout="this.style.background=\'\'">'+s+'</div>';
-  }).join('');
+  dd.innerHTML = matches.slice(0,12).map(function(s){return '<div onclick="addStateTag(\''+s+'\')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e2e8f0" onmouseover="this.style.background=\'#1a2d4a\'" onmouseout="this.style.background=\'\'">'+s+'</div>';}).join('');
   dd.style.display = 'block';
 }
-
 function addStateTag(state) {
-  if(selectedStates.indexOf(state) !== -1) return;
+  if(selectedStates.indexOf(state)!==-1) return;
   selectedStates.push(state);
   renderStateTags();
-  var inp = document.getElementById('state-input');
+  var inp=document.getElementById('state-input');
   if(inp){inp.value='';inp.focus();}
   var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
   if(typeof renderLeads==='function') renderLeads();
 }
-
 function removeStateTag(state) {
-  selectedStates = selectedStates.filter(function(s){return s!==state;});
+  selectedStates=selectedStates.filter(function(s){return s!==state;});
   renderStateTags();
   if(typeof renderLeads==='function') renderLeads();
 }
-
 function renderStateTags() {
-  var container = document.getElementById('state-tags');
+  var container=document.getElementById('state-tags');
   if(!container) return;
-  var tags = selectedStates.map(function(s){
-    return '<span style="background:#1a3d6b;color:#85B7EB;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px">'+s+'<button onclick="removeStateTag(\''+s+'\')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;line-height:1;padding:0">&times;</button></span>';
-  }).join('');
-  container.innerHTML = tags + '<input id="state-input" placeholder="'+(selectedStates.length?'':'Type state...')+'" autocomplete="off" style="border:none;background:transparent;color:#e2e8f0;outline:none;font-size:13px;min-width:60px" oninput="showStateDropdown(this.value)" onkeydown="stateInputKey(event)">';
+  var tags=selectedStates.map(function(s){return '<span style="background:#1a3d6b;color:#85B7EB;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px">'+s+'<button onclick="removeStateTag(\''+s+'\')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;line-height:1;padding:0">&times;</button></span>';}).join('');
+  container.innerHTML=tags+'<input id="state-input" placeholder="'+(selectedStates.length?'':'Type state...')+'" autocomplete="off" style="border:none;background:transparent;color:#e2e8f0;outline:none;font-size:13px;min-width:60px" oninput="showStateDropdown(this.value)" onkeydown="stateInputKey(event)">';
 }
-
 function stateInputKey(e) {
-  if(e.key==='Enter'||e.key===',') {
-    e.preventDefault();
-    var val = (e.target.value||'').trim().toUpperCase();
-    if(ALL_STATES.indexOf(val)!==-1) addStateTag(val);
-  }
-  if(e.key==='Escape') {
-    var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
-  }
-  if(e.key==='Backspace' && !e.target.value && selectedStates.length) {
-    removeStateTag(selectedStates[selectedStates.length-1]);
-  }
+  if(e.key==='Enter'||e.key===','){e.preventDefault();var val=(e.target.value||'').trim().toUpperCase();if(ALL_STATES.indexOf(val)!==-1)addStateTag(val);}
+  if(e.key==='Escape'){var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';}
+  if(e.key==='Backspace'&&!e.target.value&&selectedStates.length){removeStateTag(selectedStates[selectedStates.length-1]);}
 }
-
 document.addEventListener('click',function(e){
-  if(!e.target.closest || (!e.target.closest('#state-tags')&&!e.target.closest('#state-dropdown'))){
-    var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';
-  }
+  if(!e.target.closest||(!e.target.closest('#state-tags')&&!e.target.closest('#state-dropdown'))){var dd=document.getElementById('state-dropdown');if(dd)dd.style.display='none';}
 });
 
 // ── CUSTOM TAGS ───────────────────────────────────────────────────────
@@ -1093,16 +1071,18 @@ function navTo(page){
   currentPage=page;
   ['dashboard','leads','bucket','settings'].forEach(function(p){
     var el=document.getElementById('nav-'+p);if(el)el.classList.toggle('active',p===page);
-  });
-  ['dashboard','leads','bucket','settings'].forEach(function(p){
-    var el=document.getElementById('page-'+p);if(el)el.classList.toggle('active',p===page);
+    var pg=document.getElementById('page-'+p);if(pg)pg.classList.toggle('active',p===page);
   });
   var tp=document.getElementById('topbar-page');
   if(tp)tp.textContent={dashboard:'Dashboard',leads:'All Leads',bucket:'High Priority',settings:'Settings'}[page]||page;
+  // Clean topbar actions - icon buttons only on leads, nothing on other pages
   var ta=document.getElementById('topbar-actions');
   if(ta){
     if(page==='leads'){
-      ta.innerHTML='<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()">+ Add Lead</button> <button class="topbar-btn" onclick="openImportEmail()">&#128139; Import Email</button> <button class="topbar-btn" onclick="openImportCsv()">&#128196; Import CSV</button>';
+      ta.innerHTML=
+        '<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()" title="Add Lead" style="padding:7px 14px;font-size:13px">+ Add Lead</button>'+
+        '<button class="topbar-icon-btn" onclick="openImportEmail()" title="Import from Email" style="background:#1a2133;border:1px solid #2a3347;color:#94a3b8;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:16px;line-height:1">&#128139;</button>'+
+        '<button class="topbar-icon-btn" onclick="openImportCsv()" title="Import CSV" style="background:#1a2133;border:1px solid #2a3347;color:#94a3b8;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:16px;line-height:1">&#128196;</button>';
     } else {
       ta.innerHTML='';
     }
@@ -1117,23 +1097,60 @@ function closeSidebar(){var s=document.getElementById('sidebar');var o=document.
 var authMode='login';
 function switchAuthTab(mode,btn){authMode=mode;document.querySelectorAll('.auth-tab').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');document.getElementById('auth-submit-btn').textContent=mode==='login'?'Sign in':'Create account';document.getElementById('auth-err').textContent='';}
 
-// ── GMAIL STATUS UI ───────────────────────────────────────────────────
+// ── GMAIL STATUS ──────────────────────────────────────────────────────
 function checkGmailStatusUI(){
   var area=document.getElementById('gmail-status-area');
   if(!area) return;
-  fetch('/api/gmail-status').then(function(r){return r.json();}).then(function(d){
-    if(d&&d.connected){
-      area.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span style="color:#1D9E75;font-size:13px;font-weight:600">&#10003; Gmail connected</span><span style="color:#64748b;font-size:12px">'+d.email+'</span><button onclick="disconnectGmail()" class="topbar-btn" style="margin-left:8px">Disconnect</button></div>';
-    } else {
+  // Get current session token for API auth
+  sb.auth.getSession().then(function(r){
+    var token = r.data&&r.data.session ? r.data.session.access_token : null;
+    if(!token){
       area.innerHTML='<button onclick="openSetup()" class="topbar-btn topbar-btn-primary" style="margin-top:4px">&#128273; Connect Gmail</button>';
+      return;
     }
-  }).catch(function(){
-    area.innerHTML='<button onclick="openSetup()" class="topbar-btn topbar-btn-primary" style="margin-top:4px">&#128273; Connect Gmail</button>';
+    fetch('/api/gmail-status',{headers:{Authorization:'Bearer '+token}})
+      .then(function(res){return res.json();})
+      .then(function(d){
+        if(d&&d.connected){
+          area.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#071a0e;border:1px solid #0f4020;border-radius:8px;margin-top:4px">'+
+            '<span style="color:#1D9E75;font-size:20px">&#10003;</span>'+
+            '<div><div style="color:#e2e8f0;font-size:13px;font-weight:600">Gmail connected</div>'+
+            '<div style="color:#64748b;font-size:12px">'+d.email+'</div></div>'+
+            '<button onclick="disconnectGmail()" style="margin-left:auto;background:none;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">Disconnect</button>'+
+            '</div>';
+          // If just connected, show import toast
+          if(window._gmailJustConnected){
+            window._gmailJustConnected=false;
+            showToast('Gmail connected! Importing leads from last 7 days...',4000);
+          }
+        } else {
+          area.innerHTML='<button onclick="openSetup()" class="topbar-btn topbar-btn-primary" style="margin-top:4px">&#128273; Connect Gmail</button>';
+          if(window._gmailJustConnected){
+            window._gmailJustConnected=false;
+            // Retry once after a delay (tokens may not be saved yet)
+            setTimeout(checkGmailStatusUI, 2000);
+          }
+        }
+      }).catch(function(){
+        area.innerHTML='<button onclick="openSetup()" class="topbar-btn topbar-btn-primary" style="margin-top:4px">&#128273; Connect Gmail</button>';
+      });
   });
 }
 function disconnectGmail(){
-  if(!confirm('Disconnect Gmail integration?')) return;
-  fetch('/api/gmail-disconnect',{method:'POST'}).then(function(){checkGmailStatusUI();});
+  if(!confirm('Disconnect Gmail? Leads already imported will stay.')) return;
+  sb.auth.getSession().then(function(r){
+    var token = r.data&&r.data.session ? r.data.session.access_token : null;
+    if(!token) return;
+    // Update Supabase directly
+    sb.from('gmail_accounts').update({connected:false}).eq('user_id',r.data.session.user.id)
+      .then(function(){checkGmailStatusUI();});
+  });
+}
+function showToast(msg, duration){
+  var t=document.getElementById('copied-toast');
+  if(!t){t=document.createElement('div');t.id='copied-toast';t.className='copied-toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},duration||2000);
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────
@@ -1181,11 +1198,7 @@ function updTC(){
   if(typeof leads==='undefined')return;
   var nlc=document.getElementById('nav-leads-cnt');if(nlc)nlc.textContent=leads.length;
   var lcl=document.getElementById('leads-count-label');if(lcl)lcl.textContent=(typeof getFiltered==='function'?getFiltered().length:leads.length)+' leads';
-  if(typeof bktLeads==='function'){
-    var bl=bktLeads();
-    var nbc=document.getElementById('nav-bucket-cnt');if(nbc)nbc.textContent=bl.length;
-    var bcl=document.getElementById('bcl');if(bcl)bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');
-  }
+  if(typeof bktLeads==='function'){var bl=bktLeads();var nbc=document.getElementById('nav-bucket-cnt');if(nbc)nbc.textContent=bl.length;var bcl=document.getElementById('bcl');if(bcl)bcl.textContent=bl.length+(bl.length!==1?' leads':' lead');}
   renderDashboard();
 }
 function switchTab(){}
@@ -1196,34 +1209,31 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
   var _origOnSI = onSignedIn;
   var _signedIn = false;
   onSignedIn = async function(user){
-    if(_signedIn) return; // prevent double-run
+    if(_signedIn) return;
     _signedIn = true;
     var av=document.getElementById('sidebar-avatar');if(av)av.textContent=(user.email||'?')[0].toUpperCase();
     var em=document.getElementById('sidebar-email');if(em)em.textContent=user.email||'';
     var as=document.getElementById('auth-screen');if(as)as.style.display='none';
     await _origOnSI(user);
     navTo('dashboard');
-    // Reset flag after a short delay so sign-out + sign-in works
     setTimeout(function(){_signedIn=false;},2000);
   };
-
   handleAuth = async function(){
-    var isLogin = authMode!=='signup';
-    var email = document.getElementById('auth-email').value.trim();
-    var pass = document.getElementById('auth-pass').value;
-    var errEl = document.getElementById('auth-err');
+    var isLogin=authMode!=='signup';
+    var email=document.getElementById('auth-email').value.trim();
+    var pass=document.getElementById('auth-pass').value;
+    var errEl=document.getElementById('auth-err');
     if(!email||!pass){if(errEl)errEl.textContent='Please enter email and password.';return;}
     var btn=document.getElementById('auth-submit-btn');if(btn)btn.textContent='...';
-    var res = isLogin ? await sb.auth.signInWithPassword({email:email,password:pass}) : await sb.auth.signUp({email:email,password:pass});
+    var res=isLogin?await sb.auth.signInWithPassword({email:email,password:pass}):await sb.auth.signUp({email:email,password:pass});
     if(btn)btn.textContent=isLogin?'Sign in':'Create account';
     if(res.error){if(errEl)errEl.textContent=res.error.message;return;}
     if(!isLogin){if(errEl)errEl.textContent='Account created! Check your email to confirm.';return;}
     if(res.data.user) await onSignedIn(res.data.user);
   };
-
-  var _origUS = typeof updateStats==='function'?updateStats:null;
-  updateStats = function(){
-    if(_origUS) _origUS();
+  var _origUS=typeof updateStats==='function'?updateStats:null;
+  updateStats=function(){
+    if(_origUS)_origUS();
     if(typeof leads==='undefined')return;
     var today=new Date();today.setHours(0,0,0,0);
     var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
@@ -1235,8 +1245,7 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
     set('sb-pitched',leads.filter(function(l){return l.disposition==='pitched';}).length);
     var lcl=document.getElementById('leads-count-label');if(lcl)lcl.textContent=(typeof getFiltered==='function'?getFiltered().length:leads.length)+' leads';
   };
-
-  getFiltered = function(){
+  getFiltered=function(){
     var q=(document.getElementById('f-search')||{}).value||'';
     var dp=(document.getElementById('f-disp')||{}).value||'';
     var tz=(document.getElementById('f-timezone')||{}).value||'';
@@ -1245,7 +1254,7 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
     q=q.toLowerCase();
     return leads.filter(function(l){
       if(q&&!((l.firstName||'').toLowerCase().includes(q)||(l.lastName||'').toLowerCase().includes(q)||(l.phone||'').includes(q)||(l.email||'').toLowerCase().includes(q)||(l.zip||'').includes(q)))return false;
-      if(selectedStates.length && selectedStates.indexOf(l.state)===-1) return false;
+      if(selectedStates.length&&selectedStates.indexOf(l.state)===-1)return false;
       if(dp&&(l.disposition||'new')!==dp)return false;
       if(tz&&STATE_TZ[(l.state||'').toUpperCase()]!==tz)return false;
       if(df&&new Date(l.receivedAt)<new Date(df))return false;
@@ -1256,25 +1265,14 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
 })();
 
 // ── SESSION PERSISTENCE ───────────────────────────────────────────────
-// Restore session after all scripts are loaded
 setTimeout(function(){
-  // Listen for auth changes (token refresh keeps user logged in)
-  sb.auth.onAuthStateChange(function(_e, session){
-    if(session){
-      var as=document.getElementById('auth-screen');
-      if(!as || as.style.display==='none') return; // already in app, do nothing
-      onSignedIn(session.user).catch(function(){});
-    }
+  sb.auth.onAuthStateChange(function(_e,session){
+    if(session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(session.user).catch(function(){});}
   });
-  // Check for existing session right now
   sb.auth.getSession().then(function(r){
-    if(r.data&&r.data.session){
-      var as=document.getElementById('auth-screen');
-      if(!as || as.style.display==='none') return; // already handled
-      onSignedIn(r.data.session.user).catch(function(e){console.warn('session restore:',e);});
-    }
+    if(r.data&&r.data.session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(r.data.session.user).catch(function(e){console.warn('session restore:',e);});}
   });
-}, 100);
+},100);
 
 </script>
 </body>

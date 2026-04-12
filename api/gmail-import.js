@@ -37,10 +37,10 @@ async function getToken(sb, userId) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id:     process.env.GOOGLE_OAUTH_CLIENT_ID,
+        client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
         client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
         refresh_token: acct.refresh_token,
-        grant_type:    'refresh_token'
+        grant_type: 'refresh_token'
       })
     });
     const tokens = await res.json();
@@ -61,66 +61,84 @@ module.exports = async (req, res) => {
   try {
     const { user_id, days = 30 } = req.query;
     if (!user_id) return res.status(400).json({ error: 'user_id required' });
+
     const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const token = await getToken(sb, user_id);
     if (!token) return res.status(200).json({ imported: 0, error: 'No Gmail connected' });
 
+    // Search for USHA lead emails
     const afterSec = Math.floor((Date.now() - Number(days) * 86400000) / 1000);
     const query = 'from:ushamarketplace.com after:' + afterSec;
     const searchRes = await fetch(
-      'https://www.googleapis.com/gmail/v1/users/me/messages?q=' + encodeURIComponent(query) + '&maxResults=100',
+      'https://www.googleapis.com/gmail/v1/users/me/messages?q=' + encodeURIComponent(query) + '&maxResults=50',
       { headers: { Authorization: 'Bearer ' + token } }
     );
     const searchData = await searchRes.json();
     if (searchData.error) return res.status(200).json({ imported: 0, error: searchData.error.message });
     if (!searchData.messages?.length) return res.status(200).json({ imported: 0, checked: 0, message: 'No USHA emails found in last ' + days + ' days' });
 
-    let imported = 0, skipped = 0;
-    const errors = [];
-
-    for (const msg of searchData.messages) {
-      try {
-        const msgRes = await fetch(
-          'https://www.googleapis.com/gmail/v1/users/me/messages/' + msg.id + '?format=full',
+    // Fetch all message details IN PARALLEL (much faster than sequential)
+    const msgDetails = await Promise.all(
+      searchData.messages.map(msg =>
+        fetch('https://www.googleapis.com/gmail/v1/users/me/messages/' + msg.id + '?format=full',
           { headers: { Authorization: 'Bearer ' + token } }
-        );
-        const msgData = await msgRes.json();
-        const payload = msgData.payload;
-        let body = '';
-        if (payload?.body?.data) {
-          body = Buffer.from(payload.body.data, 'base64url').toString('utf8');
-        } else if (payload?.parts) {
-          for (const part of payload.parts) {
-            if (part.mimeType === 'text/plain' && part.body?.data) {
-              body += Buffer.from(part.body.data, 'base64url').toString('utf8');
-            }
+        ).then(r => r.json()).catch(() => null)
+      )
+    );
+
+    // Get existing phones to deduplicate
+    const { data: existingLeads } = await sb.from('leads')
+      .select('phone, email_message_id')
+      .eq('user_id', user_id);
+    const existingPhones = new Set((existingLeads||[]).map(l => l.phone).filter(Boolean));
+    const existingMsgIds = new Set((existingLeads||[]).map(l => l.email_message_id).filter(Boolean));
+
+    const toInsert = [];
+    for (const msgData of msgDetails) {
+      if (!msgData?.payload) continue;
+      const payload = msgData.payload;
+      let body = '';
+      if (payload.body?.data) {
+        body = Buffer.from(payload.body.data, 'base64url').toString('utf8');
+      } else if (payload.parts) {
+        for (const part of payload.parts) {
+          if (part.mimeType === 'text/plain' && part.body?.data) {
+            body += Buffer.from(part.body.data, 'base64url').toString('utf8');
           }
         }
-        if (!body) continue;
-        const lead = parseUshaEmail(body);
-        if (!lead.first_name && !lead.phone) continue;
+      }
+      if (!body) continue;
+      const lead = parseUshaEmail(body);
+      if (!lead.first_name && !lead.phone) continue;
+      if (existingMsgIds.has(msgData.id)) continue;
+      if (lead.phone && existingPhones.has(lead.phone)) continue;
 
-        const dateHeader = (payload?.headers || []).find(h => h.name === 'Date');
-        lead.received_at = dateHeader ? new Date(dateHeader.value).toISOString() : new Date().toISOString();
-        lead.user_id = user_id;
-        lead.email_message_id = msg.id;
-
-        // Skip duplicate by message ID
-        const { data: dup1 } = await sb.from('leads').select('id').eq('email_message_id', msg.id).eq('user_id', user_id).maybeSingle();
-        if (dup1) { skipped++; continue; }
-        // Skip duplicate by phone
-        if (lead.phone) {
-          const { data: dup2 } = await sb.from('leads').select('id').eq('phone', lead.phone).eq('user_id', user_id).maybeSingle();
-          if (dup2) { skipped++; continue; }
-        }
-
-        const { error: insertErr } = await sb.from('leads').insert(lead);
-        if (!insertErr) imported++;
-        else errors.push(insertErr.message);
-      } catch(e) { errors.push(e.message); }
+      const dateHeader = (payload.headers||[]).find(h => h.name === 'Date');
+      lead.received_at = dateHeader ? new Date(dateHeader.value).toISOString() : new Date().toISOString();
+      lead.user_id = user_id;
+      lead.email_message_id = msgData.id;
+      toInsert.push(lead);
+      existingPhones.add(lead.phone); // prevent within-batch dupes
     }
-    return res.status(200).json({ imported, skipped, checked: searchData.messages.length, errors: errors.slice(0,3) });
+
+    let imported = 0;
+    const errors = [];
+    if (toInsert.length > 0) {
+      // Batch insert all at once
+      const { error: insertErr } = await sb.from('leads').insert(toInsert);
+      if (insertErr) errors.push(insertErr.message);
+      else imported = toInsert.length;
+    }
+
+    return res.status(200).json({
+      imported,
+      skipped: searchData.messages.length - toInsert.length,
+      checked: searchData.messages.length,
+      errors: errors.slice(0, 3)
+    });
+
   } catch(err) {
+    console.error('gmail-import:', err.message);
     return res.status(500).json({ imported: 0, error: err.message });
   }
 };

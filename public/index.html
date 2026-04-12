@@ -1080,9 +1080,9 @@ function navTo(page){
   if(ta){
     if(page==='leads'){
       ta.innerHTML=
-        '<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()" title="Add Lead" style="padding:7px 14px;font-size:13px">+ Add Lead</button>'+
-        '<button class="topbar-icon-btn" onclick="openImportEmail()" title="Import from Email" style="background:#1a2133;border:1px solid #2a3347;color:#94a3b8;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:16px;line-height:1">&#128139;</button>'+
-        '<button class="topbar-icon-btn" onclick="openImportCsv()" title="Import CSV" style="background:#1a2133;border:1px solid #2a3347;color:#94a3b8;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:16px;line-height:1">&#128196;</button>';
+        '<button class="topbar-btn topbar-btn-primary" onclick="openAddLead()">+ Add Lead</button>'+
+        '<button class="topbar-icon-btn" onclick="openImportEmail()" title="Import from email">&#128139;</button>'+
+        '<button class="topbar-icon-btn" onclick="openImportCsv()" title="Import CSV">&#128196;</button>';
     } else {
       ta.innerHTML='';
     }
@@ -1116,7 +1116,10 @@ function checkGmailStatusUI(){
             '<span style="color:#1D9E75;font-size:20px">&#10003;</span>'+
             '<div><div style="color:#e2e8f0;font-size:13px;font-weight:600">Gmail connected</div>'+
             '<div style="color:#64748b;font-size:12px">'+d.email+'</div></div>'+
-            '<button onclick="disconnectGmail()" style="margin-left:auto;background:none;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">Disconnect</button>'+
+            '<div style="margin-left:auto;display:flex;gap:6px">'+
+            '<button onclick="syncGmail()" style="background:#1a2d4a;border:1px solid #2a3347;color:#85B7EB;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer">&#128260; Sync Now</button>'+
+            '<button onclick="disconnectGmail()" style="background:none;border:1px solid #2a3347;color:#64748b;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">Disconnect</button>'+
+            '</div>'+
             '</div>';
           // If just connected, show import toast
           if(window._gmailJustConnected){
@@ -1136,14 +1139,28 @@ function checkGmailStatusUI(){
       });
   });
 }
+function syncGmail(){
+  sb.auth.getSession().then(function(r){
+    var uid = r.data&&r.data.session ? r.data.session.user.id : null;
+    if(!uid) return;
+    var btn = document.querySelector('[onclick="syncGmail()"]');
+    if(btn){btn.textContent='Syncing...';btn.disabled=true;}
+    fetch('/api/gmail-import?user_id='+encodeURIComponent(uid)+'&days=30')
+      .then(function(res){return res.json();})
+      .then(function(d){
+        if(btn){btn.textContent='\u21BA Sync Now';btn.disabled=false;}
+        showToast(d.imported > 0 ? 'Imported '+d.imported+' leads!' : (d.message||d.error||'No new leads found'), 3500);
+        if(d.imported > 0 && typeof loadLeads==='function') loadLeads();
+      }).catch(function(){if(btn){btn.textContent='\u21BA Sync Now';btn.disabled=false;}});
+  });
+}
 function disconnectGmail(){
   if(!confirm('Disconnect Gmail? Leads already imported will stay.')) return;
   sb.auth.getSession().then(function(r){
-    var token = r.data&&r.data.session ? r.data.session.access_token : null;
-    if(!token) return;
-    // Update Supabase directly
-    sb.from('gmail_accounts').update({connected:false}).eq('user_id',r.data.session.user.id)
-      .then(function(){checkGmailStatusUI();});
+    var uid = r.data&&r.data.session ? r.data.session.user.id : null;
+    if(!uid) return;
+    sb.from('gmail_accounts').update({access_token:null,refresh_token:null}).eq('user_id',uid)
+      .then(function(){checkGmailStatusUI();showToast('Gmail disconnected');});
   });
 }
 function showToast(msg, duration){

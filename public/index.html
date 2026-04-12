@@ -1,12 +1,4 @@
-<div class="modal-overlay" id="import-email-modal">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-title">Import Lead</div>
-    <p style="font-size:13px;color:#64748b;margin:0 0 12px">Paste from USHA email or PitchPerfect — works with both formats</p>
-    <textarea id="import-paste-area" placeholder="Paste lead info here..." style="width:100%;height:160px;background:#0f1420;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:12px;font-size:13px;resize:vertical;font-family:inherit;box-sizing:border-box;outline:none"></textarea>
-    <div class="modal-row">
-      <button class="btn-cancel" onclick="closeImportEmail()">Cancel</button>
-      <button class="btn-primary" onclick="importFromPaste()">Import Lead</button>
-    </div>
+
   </div>
 </div><!DOCTYPE html><!-- v3 -->
 <html lang="en">
@@ -534,11 +526,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <div class="modal-bg" id="import-email-modal">
-  <div class="modal">
-    <div class="modal-title">Import lead from email</div>
-    <div class="modal-sub">Paste the full text of a LeadArena email — all fields pulled automatically.</div>
-    <textarea class="modal-input" id="paste-email" placeholder="Paste full email text here..." style="min-height:150px;resize:vertical;font-size:13px;line-height:1.6"></textarea>
-    <div class="modal-row"><button class="btn-cancel" onclick="closeImportEmail()">Cancel</button><button class="btn-primary" onclick="importFromEmail()">Import lead</button></div>
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">Import Lead</div>
+    <p style="font-size:13px;color:#64748b;margin:0 0 12px">Paste from USHA email or PitchPerfect — works with both formats</p>
+    <textarea id="import-paste-area" placeholder="Paste lead info here..." style="width:100%;height:160px;background:#0f1420;border:1px solid #2a3347;border-radius:8px;color:#e2e8f0;padding:12px;font-size:13px;resize:vertical;font-family:inherit;box-sizing:border-box;outline:none"></textarea>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeImportEmail()">Cancel</button>
+      <button class="btn-primary" onclick="importFromPaste()">Import Lead</button>
+    </div>
   </div>
 </div>
 <div class="modal-bg" id="add-lead-modal">

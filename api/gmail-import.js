@@ -17,11 +17,10 @@ function parseUshaEmail(body) {
     age_range:   get('Age Range'),
     income:      get('Income'),
     household:   get('Household'),
-    notes:       get('Comments') || '',
+    comments:    get('Comments') || '',
     campaign:    get('Name'),
     price:       parseFloat(get('Price')) || null,
     lead_id_ext: get('Lead Id'),
-    source:      'gmail',
     disposition: 'new',
   };
 }
@@ -66,7 +65,6 @@ module.exports = async (req, res) => {
     const token = await getToken(sb, user_id);
     if (!token) return res.status(200).json({ imported: 0, error: 'No Gmail connected' });
 
-    // Search for USHA lead emails
     const afterSec = Math.floor((Date.now() - Number(days) * 86400000) / 1000);
     const query = 'from:ushamarketplace.com after:' + afterSec;
     const searchRes = await fetch(
@@ -77,7 +75,7 @@ module.exports = async (req, res) => {
     if (searchData.error) return res.status(200).json({ imported: 0, error: searchData.error.message });
     if (!searchData.messages?.length) return res.status(200).json({ imported: 0, checked: 0, message: 'No USHA emails found in last ' + days + ' days' });
 
-    // Fetch all message details IN PARALLEL (much faster than sequential)
+    // Parallel fetch all message details
     const msgDetails = await Promise.all(
       searchData.messages.map(msg =>
         fetch('https://www.googleapis.com/gmail/v1/users/me/messages/' + msg.id + '?format=full',
@@ -86,12 +84,10 @@ module.exports = async (req, res) => {
       )
     );
 
-    // Get existing phones to deduplicate
-    const { data: existingLeads } = await sb.from('leads')
-      .select('phone, email_message_id')
-      .eq('user_id', user_id);
-    const existingPhones = new Set((existingLeads||[]).map(l => l.phone).filter(Boolean));
-    const existingMsgIds = new Set((existingLeads||[]).map(l => l.email_message_id).filter(Boolean));
+    // Get existing phones + message IDs to deduplicate
+    const { data: existing } = await sb.from('leads').select('phone, email_message_id').eq('user_id', user_id);
+    const existingPhones = new Set((existing||[]).map(l => l.phone).filter(Boolean));
+    const existingMsgIds = new Set((existing||[]).map(l => l.email_message_id).filter(Boolean));
 
     const toInsert = [];
     for (const msgData of msgDetails) {
@@ -118,13 +114,12 @@ module.exports = async (req, res) => {
       lead.user_id = user_id;
       lead.email_message_id = msgData.id;
       toInsert.push(lead);
-      existingPhones.add(lead.phone); // prevent within-batch dupes
+      existingPhones.add(lead.phone);
     }
 
     let imported = 0;
     const errors = [];
     if (toInsert.length > 0) {
-      // Batch insert all at once
       const { error: insertErr } = await sb.from('leads').insert(toInsert);
       if (insertErr) errors.push(insertErr.message);
       else imported = toInsert.length;
@@ -136,9 +131,7 @@ module.exports = async (req, res) => {
       checked: searchData.messages.length,
       errors: errors.slice(0, 3)
     });
-
   } catch(err) {
-    console.error('gmail-import:', err.message);
     return res.status(500).json({ imported: 0, error: err.message });
   }
 };

@@ -141,6 +141,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .saved-ind{font-size:11px;color:#639922;height:16px;margin-top:4px}
 .expand-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .expand-btn{background:none;border:none;color:#4a5568;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;font-size:11px;transition:color 0.15s} .expand-btn:hover{color:#94a3b8;background:#1a2133} .btn-edit{background:none;border:none;color:#4a5568;font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px;font-weight:500;transition:color 0.15s} .btn-edit:hover{color:#85B7EB} .btn-delete{background:none;border:none;color:#4a5568;font-size:13px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:color 0.15s} .btn-delete:hover{color:#E24B4A} .lead-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:72px;flex-shrink:0} .lead-actions{display:flex;align-items:center;gap:2px;margin-top:4px} .lead-tz-badge{font-size:10px;color:#4a5568;background:#0f1420;border:1px solid #1e2535;border-radius:3px;padding:1px 5px;font-weight:500;margin-left:4px}
+.lead-source-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;white-space:nowrap;display:inline-block}
+.src-excljumbo{background:#1a1040;color:#AFA9EC}
+.src-trueexcl{background:#071a0e;color:#1D9E75}
+.src-dynasty{background:#1a1512;color:#EF9F27}
+.src-shared{background:#0d1a2a;color:#85B7EB}
+.src-sharedjumbo{background:#1a0d2a;color:#CDB4F0}
+.src-aged{background:#14141a;color:#64748b}
+.src-hotline{background:#1a0d0d;color:#F09595}
+.src-custom{background:#1a2133;color:#94a3b8}
 .expand-btn:hover{background:#2a3347;color:#e2e8f0}
 .expand-btn-danger{border-color:#3a1010;color:#F09595}
 .expand-btn-danger:hover{background:#3a1010}
@@ -420,6 +429,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <option value="HT">Hawaii (HT)</option>
           </select>
         </div>
+        <div class="filter-group">
+          <div class="filter-label">Source</div>
+          <select class="filter-select" id="f-source"><option value="">All sources</option><option value="Exclusive JUMBO">Exclusive JUMBO</option><option value="True Exclusive 3x">True Exclusive 3x</option><option value="Dynasty Exclusive">Dynasty Exclusive</option><option value="Shared">Shared</option><option value="Shared JUMBO">Shared JUMBO</option><option value="Aged Leads">Aged Leads</option><option value="Hotline Bling">Hotline Bling</option></select>
+        </div>
       </div>
       <div class="filter-row">
         <div class="filter-search-wrap">
@@ -435,7 +448,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- Stats bar -->
     <div class="stats-bar" id="leads-stats-bar">
       <div class="sb-item"><div class="sb-val" id="sb-total">0</div><div class="sb-label">Total</div></div>
-      <div class="sb-item"><div class="sb-val" id="sb-today">0</div><div class="sb-label">Today</div></div>
+      <div class="sb-item"><div class="sb-val" id="sb-today">0</div><div class="sb-label">Today</div>
+        <div style="display:flex;gap:6px;align-items:center;padding:2px 0;margin-top:2px">
+          <span style="font-size:11px;color:#4a5568;font-weight:500">Sort:</span>
+          <button class="filter-btn-reset" style="padding:2px 8px;font-size:11px" onclick="sortLeads('date')">Date</button>
+          <button class="filter-btn-reset" style="padding:2px 8px;font-size:11px" onclick="sortLeads('price')">Price</button>
+          <button class="filter-btn-reset" style="padding:2px 8px;font-size:11px" onclick="sortLeads('source')">Source</button>
+        </div></div>
       <div class="sb-item"><div class="sb-val" id="sb-sold">0</div><div class="sb-label">Sold</div></div>
       <div class="sb-item"><div class="sb-val" id="sb-apt">0</div><div class="sb-label">Apts</div></div>
       <div class="sb-item"><div class="sb-val" id="sb-cb">0</div><div class="sb-label">Call backs</div></div>
@@ -576,6 +595,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Income</div><input class="modal-input" id="al-income" placeholder="$30,000-$50,000" style="margin-bottom:0"/></div>
       <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Household</div><select class="modal-input" id="al-household" style="margin-bottom:0"><option value="">Select...</option><option value="Individual">Individual</option><option value="Family">Family</option><option value="Couple">Couple</option></select></div>
       <div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Lead cost ($)</div><input class="modal-input" id="al-price" placeholder="35" style="margin-bottom:0"/></div>
+            <div class="modal-group">
+              <div class="modal-label">Lead Source</div>
+              <select class="modal-input" id="al-source">
+                <option value="">Select source...</option>
+                <option value="Exclusive JUMBO">Exclusive JUMBO</option><option value="True Exclusive 3x">True Exclusive 3x</option><option value="Dynasty Exclusive">Dynasty Exclusive</option><option value="Shared">Shared</option><option value="Shared JUMBO">Shared JUMBO</option><option value="Aged Leads">Aged Leads</option><option value="Hotline Bling">Hotline Bling</option>
+                <option value="__custom__">+ Custom...</option>
+              </select>
+            </div>
     </div>
     <div style="margin-bottom:10px"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Comments</div><input class="modal-input" id="al-comments" placeholder="e.g. health-for-moms" style="margin-bottom:0"/></div>
     <div class="modal-row"><button class="btn-cancel" onclick="closeAddLead()">Cancel</button><button class="btn-primary" onclick="saveManualLead()">Add lead</button></div>
@@ -707,12 +734,12 @@ async function handleAuth(){const email=document.getElementById('auth-email').va
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');}
 async function onSignedIn(user){currentUser=user;const name=user.user_metadata?.name||user.email.split('@')[0];document.getElementById('user-name-display').textContent=name;document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';await loadLeads();restoreGmailPolling();checkGmailConnection();}
 async function signOut(){if(pollInterval)clearInterval(pollInterval);await sb.auth.signOut();currentUser=null;leads=[];expanded.clear();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('auth-submit-btn').disabled=false;document.getElementById('auth-submit-btn').textContent='Sign in';}
-async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',
+async function loadLeads(){const{data,error}=await sb.from('leads').select('*').eq('user_id',currentUser.id).order('received_at',{ascending:false});if(error){console.error(error);return;}leads=(data||[]).map(r=>({id:r.id,firstName:r.first_name||'',lastName:r.last_name||'',phone:r.phone||'',email:r.email||'',state:r.state||'',zip:r.zip||'',age:r.age||'',ageRange:r.age_range||'',income:r.income||'',household:r.household||'',dob:r.dob||'',comments:r.comments||'',campaign:r.campaign||'',price:r.price||'',leadSource:r.lead_source||'',leadId:r.lead_id||'',receivedAt:r.received_at,disposition:r.disposition||'new',notes:r.notes||'',
    customDisp:r.custom_disp||'',
    tags:(()=>{try{const t=JSON.parse(r.custom_disp);return Array.isArray(t)?t:[r.disposition||'new'];}catch(e){return[r.disposition||'new'];}})(),
    customText:(()=>{try{const t=JSON.parse(r.custom_disp);if(Array.isArray(t)){const c=t.find(x=>x.startsWith('custom:'));return c?c.slice(7):'';}return r.custom_disp||'';}catch(e){return r.custom_disp||'';}})()
   }));renderLeads();var _nb=document.getElementById('nav-leads-cnt');if(_nb)_nb.textContent=leads.length;var _nb2=document.getElementById('nav-bucket-cnt');if(_nb2){var _hpc=(leads||[]).filter(function(x){return['new','callback','noanswer','missedapt'].indexOf(x.disposition)>-1;}).length;_nb2.textContent=_hpc||'';}updateStats();if(typeof updTC==="function")updTC();}
-async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error(error);showSaving(false);}
+async function saveLead(l){showSaving(true);const{error}=await sb.from('leads').upsert({id:l.id,user_id:currentUser.id,first_name:l.firstName,last_name:l.lastName,phone:l.phone,email:l.email,state:l.state,zip:l.zip,age:l.age,age_range:l.ageRange,income:l.income,household:l.household,dob:l.dob,comments:l.comments,campaign:l.campaign,price:l.price,lead_source:l.leadSource||null,lead_id:l.leadId,received_at:l.receivedAt,disposition:l.disposition,notes:l.notes,custom_disp:l.customDisp});if(error)console.error(error);showSaving(false);}
 async function updateField(id,fields){const{error}=await sb.from('leads').update(fields).eq('id',id).eq('user_id',currentUser.id);if(error)console.error(error);}
 function showSaving(on){document.getElementById('saving-status').style.display=on?'flex':'none';}
 function initials(n){if(!n)return'?';const p=n.trim().split(' ');return p.length>1?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0].slice(0,2).toUpperCase();}
@@ -720,7 +747,7 @@ function dispInfo(k){return DISPS.find(d=>d.key===k)||DISPS[0];}
 function formatPhone(p){if(!p)return'—';const d=p.replace(/\D/g,'');if(d.length===10)return`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;return p;}
 function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
 function copyPhone(phone){const d=(phone||'').replace(/\D/g,'');if(!d)return;navigator.clipboard.writeText(d).then(()=>{const t=document.getElementById('copied-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);});}
-function getFiltered(){if(!document.getElementById('search'))return leads||[];const q=document.getElementById('f-search').value.toLowerCase();const st=_sg('state-input').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
+function getFiltered(){if(!document.getElementById('search'))return leads||[];var _srcF=(document.getElementById('f-source')||{value:''}).value;const q=document.getElementById('f-search').value.toLowerCase();const st=_sg('state-input').value;const di=document.getElementById('f-disp').value;const hh=document.getElementById('f-household').value;return leads.filter(l=>{const name=(l.firstName+' '+l.lastName).toLowerCase();if(q&&!name.includes(q)&&!(l.phone||'').includes(q)&&!(l.email||'').toLowerCase().includes(q))return false;if(st&&l.state!==st)return false;if(di&&l.disposition!==di)return false;if(hh&&l.household!==hh)return false;return true;});}
 
 function renderLeads(){if(!document.getElementById("leads-list"))return;var _sg=function(id){return document.getElementById(id)||{textContent:'',innerHTML:'',value:''};};
   const list=document.getElementById('leads-list');
@@ -769,7 +796,7 @@ function renderLeads(){if(!document.getElementById("leads-list"))return;var _sg=
         </div>
         <div class="lead-right">
           <div class="lead-date">${fmtDate(l.receivedAt)}</div>
-          ${l.price?`<div class="lead-cost">${l.price}</div>`:''}
+          ${l.price?`<div class="lead-cost">${l.price}</div>`:''}${l.leadSource?'<span class="lead-source-badge '+srcClass(l.leadSource)+'">'+l.leadSource+'</span>':''}
           <div class="lead-actions">
             <button class="btn-edit" onclick="startEdit('${l.id}')">${editing?'✓':'edit'}</button>
             <button class="btn-delete" onclick="deleteLead('${l.id}',event)" title="Delete">✕</button>
@@ -868,7 +895,7 @@ function openAddLead(){document.getElementById('add-lead-modal').classList.add('
 function closeAddLead(){document.getElementById('add-lead-modal').classList.remove('open');['al-first','al-last','al-phone','al-email','al-state','al-zip','al-age','al-income','al-household','al-price','al-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 function openSetup(){document.getElementById('setup-modal').classList.add('open');}
 function closeSetup(){document.getElementById('setup-modal').classList.remove('open');}
-async function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:crypto.randomUUID(),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);renderLeads();updateStats();if(typeof updTC==="function")updTC();closeAddLead();await saveLead(lead);}
+async function saveManualLead(){const phone=document.getElementById('al-phone').value.trim();if(!phone){alert('Phone number is required.');return;}const lead={id:crypto.randomUUID(),firstName:document.getElementById('al-first').value.trim(),lastName:document.getElementById('al-last').value.trim(),phone,email:document.getElementById('al-email').value.trim(),state:document.getElementById('al-state').value.trim(),zip:document.getElementById('al-zip').value.trim(),ageRange:document.getElementById('al-age').value.trim(),income:document.getElementById('al-income').value.trim(),household:document.getElementById('al-household').value,price:document.getElementById('al-price').value.trim(),leadSource:document.getElementById('al-source')?.value||'',comments:document.getElementById('al-comments').value.trim(),age:'',dob:'',campaign:'Manual',leadId:'',receivedAt:new Date().toISOString(),disposition:'new',notes:'',customDisp:''};leads.unshift(lead);renderLeads();updateStats();if(typeof updTC==="function")updTC();closeAddLead();await saveLead(lead);}
 async function importFromEmail(){const raw=document.getElementById('paste-email').value;if(!raw.trim()){alert('Please paste the email text first.');return;}const lead=parseLeadEmail(raw);if(!lead.firstName&&!lead.phone){alert('Could not find lead info — paste the full email text.');return;}leads.unshift(lead);renderLeads();updateStats();if(typeof updTC==="function")updTC();closeImportEmail();await saveLead(lead);}
 function saveGmail(){const addr=document.getElementById('gmail-addr').value.trim();const pass=document.getElementById('gmail-pass').value.trim();if(!addr||!pass){alert('Please enter both fields.');return;}localStorage.setItem('mp_gmail',JSON.stringify({addr,pass}));closeSetup();startPolling(addr,pass);}
 function restoreGmailPolling(){const saved=localStorage.getItem('mp_gmail');if(saved){try{const{addr,pass}=JSON.parse(saved);document.getElementById('gmail-addr').value=addr;document.getElementById('gmail-pass').value=pass;startPolling(addr,pass);}catch(e){}}}
@@ -1379,6 +1406,31 @@ setTimeout(function(){
   });
 },100);
 
+
+function srcClass(s){
+  if(!s)return 'src-custom';
+  var k=s.toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(k.includes('excljumbo')||k.includes('exclusivejumbo'))return 'src-excljumbo';
+  if(k.includes('trueexcl')||k.includes('3x'))return 'src-trueexcl';
+  if(k.includes('dynasty'))return 'src-dynasty';
+  if(k.includes('sharedjumbo'))return 'src-sharedjumbo';
+  if(k.includes('shared'))return 'src-shared';
+  if(k.includes('aged'))return 'src-aged';
+  if(k.includes('hotline'))return 'src-hotline';
+  return 'src-custom';
+}
+var _sortDir={date:-1,price:-1,source:1};
+function sortLeads(by){
+  _sortDir[by]=-_sortDir[by];
+  leads.sort(function(a,b){
+    var d=_sortDir[by];
+    if(by==='date')return d*(new Date(b.receivedAt)-new Date(a.receivedAt));
+    if(by==='price')return d*((parseFloat(b.price)||0)-(parseFloat(a.price)||0));
+    if(by==='source')return d*((a.leadSource||'').localeCompare(b.leadSource||''));
+    return 0;
+  });
+  renderLeads();
+}
 </script>
 </body>
 </html>

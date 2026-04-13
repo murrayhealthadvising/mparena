@@ -1344,10 +1344,10 @@ function switchMainTab(n){navTo(n==='all'?'leads':'bucket');}
 // ── SESSION PERSISTENCE ───────────────────────────────────────────────
 setTimeout(function(){
   sb.auth.onAuthStateChange(function(_e,session){
-    if(session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(session.user).then(function(){loadLeads();}).catch(function(){});}
+    if(session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(session.user);loadLeads();}
   });
   sb.auth.getSession().then(function(r){
-    if(r.data&&r.data.session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(r.data.session.user).then(function(){loadLeads();}).catch(function(e){console.warn(e);});}
+    if(r.data&&r.data.session){var as=document.getElementById('auth-screen');if(!as||as.style.display==='none')return;onSignedIn(r.data.session.user);setTimeout(function(){loadLeads();},300);}
   });
 },100);
 
